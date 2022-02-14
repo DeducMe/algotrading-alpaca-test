@@ -110,6 +110,12 @@
     finishDate.setHours(20, 55, 0);
     startDate.setHours(14, 35, 0);
 
+    console.log(
+      dateNow.toISOString(),
+      startDate.toISOString(),
+      finishDate.toISOString()
+    );
+
     const startTime = startDate.getTime();
     const finishTime = finishDate.getTime();
     if (timeNow >= startTime && !working) {
