@@ -107,6 +107,8 @@
 
     const timeNow = dateNow.getTime();
 
+    console.log(dateNow.toISOString);
+
     finishDate.setHours(23, 55, 0);
     startDate.setHours(17, 35, 0);
 
