@@ -87,7 +87,7 @@
 
   const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
   const stocksWatchTimeouts = <any>[];
-  let working = true;
+  let working = false;
 
   function startTrading() {
     stocks.forEach((item, index) => {
