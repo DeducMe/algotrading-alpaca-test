@@ -12,7 +12,8 @@
     "typescript": "^4.5.5"
   },
   "scripts": {
-    "start": "tsc && node lib/index.js",
+    "tsc": "./node_modules/typescript/bin/tsc",
+    "start": "npm run tsc && node lib/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

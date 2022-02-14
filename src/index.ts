@@ -99,6 +99,7 @@
     });
   }
 
+  console.log("started");
   setInterval(() => {
     const dateNow = new Date();
     const finishDate = new Date();
