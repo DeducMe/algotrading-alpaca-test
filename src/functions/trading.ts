@@ -3,13 +3,17 @@
   const { keyId, secretKey } = require("../config");
 
   const setTrade = async (ticker: string, tradeWay: string, alpaca: any) => {
-    await alpaca.createOrder({
-      symbol: ticker,
-      notional: 1000, // will buy fractional shares
-      side: tradeWay,
-      type: "market",
-      time_in_force: "day",
-    });
+    try {
+      await alpaca.createOrder({
+        symbol: ticker,
+        notional: 1000, // will buy fractional shares
+        side: tradeWay,
+        type: "market",
+        time_in_force: "day",
+      });
+    } catch (e) {
+      console.log(e);
+    }
     console.log(`look mom i ${tradeWay} stonks: ${ticker}`);
   };
 
