@@ -63,20 +63,33 @@
       if (lastLowest && lastHighest) {
         try {
           if (lastLowest > lastTrade && !awaitForBuyBars) {
-            setTrade(ticker, "buy", alpaca);
+            console.log(ticker);
+            setTrade(ticker, "buy", lastTrade, alpaca);
 
             awaitForBuyBars = true;
             tradeLatestBuyBarTime = latestBarBuyTime;
 
-            console.log(lastLowest, lastHighest, " bought by ", lastTrade);
+            console.log(
+              lastLowest,
+              lastHighest,
+              ticker,
+              " bought by ",
+              lastTrade
+            );
           }
           if (lastHighest < lastTrade && !awaitForSellBars) {
-            setTrade(ticker, "sell", alpaca);
+            setTrade(ticker, "sell", lastTrade, alpaca);
 
             awaitForSellBars = true;
             tradeLatestSellBarTime = latestBarSellTime;
 
-            console.log(lastLowest, lastHighest, " sold by ", lastTrade);
+            console.log(
+              lastLowest,
+              lastHighest,
+              ticker,
+              " sold by ",
+              lastTrade
+            );
           }
         } catch (e) {
           console.log(e);

@@ -2,17 +2,22 @@
   const axios = require("axios");
   const { keyId, secretKey } = require("../config");
 
-  const setTrade = async (ticker: string, tradeWay: string, alpaca: any) => {
+  const setTrade = async (
+    ticker: string,
+    tradeWay: string,
+    price: number,
+    alpaca: any
+  ) => {
     try {
       await alpaca.createOrder({
         symbol: ticker,
-        notional: 1000, // will buy fractional shares
+        qty: Math.round(1000 / price), // will buy fractional shares
         side: tradeWay,
         type: "market",
         time_in_force: "day",
       });
     } catch (e) {
-      console.log(e);
+      console.log(e, "cant create order");
     }
     console.log(`look mom i ${tradeWay} stonks: ${ticker}`);
   };
