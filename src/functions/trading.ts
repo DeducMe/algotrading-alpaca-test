@@ -9,9 +9,10 @@
     alpaca: any
   ) => {
     try {
+      const account = await alpaca.getAccount();
       await alpaca.createOrder({
         symbol: ticker,
-        qty: Math.round(1000 / price), // will buy fractional shares
+        qty: Math.round((account.buying_power * 0.1) / price), // will buy fractional shares
         side: tradeWay,
         type: "market",
         time_in_force: "day",
@@ -19,7 +20,6 @@
     } catch (e) {
       console.log(e, "cant create order");
     }
-    console.log(`look mom i ${tradeWay} stonks: ${ticker}`);
   };
 
   function timeNow(minusHours?: number) {
