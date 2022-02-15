@@ -6,7 +6,7 @@
   } = require("../functions/trading");
 
   function main(stocks: string[], alpaca: any) {
-    const stocksWatchTimeouts = <any>[];
+    const stocksWatchIntervals = <any>[];
 
     const timeInterval = setInterval(() => {
       const dateNow = new Date();
@@ -40,87 +40,87 @@
       let latestBarSellTime = <number | null>null;
       let tradeLatestSellBarTime = <number | null>null;
 
-      setInterval(async () => {
-        const barsForBuy = await getHighestLowest(ticker, alpaca);
-        const barsForSell = JSON.parse(JSON.stringify(barsForBuy));
-        barsForBuy.length = 20;
-        barsForSell.length = 10;
+      stocksWatchIntervals.push(
+        setInterval(async () => {
+          const barsForBuy = await getHighestLowest(ticker, alpaca);
+          const barsForSell = JSON.parse(JSON.stringify(barsForBuy));
+          barsForBuy.length = 20;
+          barsForSell.length = 10;
 
-        lastTrade = await getLastTrade(ticker, alpaca);
+          lastTrade = await getLastTrade(ticker, alpaca);
 
-        farthestBarBuyTime = Date.parse(barsForBuy.responses[0].Timestamp);
-        latestBarBuyTime = Date.parse(
-          barsForBuy.responses[barsForBuy.responses.length - 1].Timestamp
-        );
-        if (farthestBarBuyTime === tradeLatestBuyBarTime && awaitForBuyBars) {
-          awaitForBuyBars = false;
-        }
-
-        farthestBarSellTime = Date.parse(barsForSell.responses[0].Timestamp);
-        latestBarSellTime = Date.parse(
-          barsForSell.responses[barsForSell.responses.length - 1].Timestamp
-        );
-        if (
-          farthestBarSellTime === tradeLatestSellBarTime &&
-          awaitForSellBars
-        ) {
-          awaitForSellBars = false;
-        }
-
-        if (lastLowest && lastHighest) {
-          try {
-            if (lastLowest > lastTrade && !awaitForBuyBars) {
-              setTrade(ticker, "buy", lastTrade, alpaca);
-
-              awaitForBuyBars = true;
-              tradeLatestBuyBarTime = latestBarBuyTime;
-
-              console.log(
-                lastLowest,
-                lastHighest,
-                ticker,
-                "bought by",
-                lastTrade
-              );
-            }
-            if (lastHighest < lastTrade && !awaitForSellBars) {
-              setTrade(ticker, "sell", lastTrade, alpaca);
-
-              awaitForSellBars = true;
-              tradeLatestSellBarTime = latestBarSellTime;
-
-              console.log(
-                lastLowest,
-                lastHighest,
-                ticker,
-                "sold by",
-                lastTrade
-              );
-            }
-          } catch (e) {
-            console.log(e);
+          farthestBarBuyTime = Date.parse(barsForBuy.responses[0].Timestamp);
+          latestBarBuyTime = Date.parse(
+            barsForBuy.responses[barsForBuy.responses.length - 1].Timestamp
+          );
+          if (farthestBarBuyTime === tradeLatestBuyBarTime && awaitForBuyBars) {
+            awaitForBuyBars = false;
           }
-        }
 
-        lastHighest = barsForSell.highest;
-        lastLowest = barsForBuy.lowest;
+          farthestBarSellTime = Date.parse(barsForSell.responses[0].Timestamp);
+          latestBarSellTime = Date.parse(
+            barsForSell.responses[barsForSell.responses.length - 1].Timestamp
+          );
+          if (
+            farthestBarSellTime === tradeLatestSellBarTime &&
+            awaitForSellBars
+          ) {
+            awaitForSellBars = false;
+          }
 
-        // console.log(lastHighest, lastLowest, lastTrade, ticker);
-      }, stocksTimeOut);
+          if (lastLowest && lastHighest) {
+            try {
+              if (lastLowest > lastTrade && !awaitForBuyBars) {
+                setTrade(ticker, "buy", lastTrade, alpaca);
+
+                awaitForBuyBars = true;
+                tradeLatestBuyBarTime = latestBarBuyTime;
+
+                console.log(
+                  lastLowest,
+                  lastHighest,
+                  ticker,
+                  "bought by",
+                  lastTrade
+                );
+              }
+              if (lastHighest < lastTrade && !awaitForSellBars) {
+                setTrade(ticker, "sell", lastTrade, alpaca);
+
+                awaitForSellBars = true;
+                tradeLatestSellBarTime = latestBarSellTime;
+
+                console.log(
+                  lastLowest,
+                  lastHighest,
+                  ticker,
+                  "sold by",
+                  lastTrade
+                );
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          }
+
+          lastHighest = barsForSell.highest;
+          lastLowest = barsForBuy.lowest;
+
+          // console.log(lastHighest, lastLowest, lastTrade, ticker);
+        }, stocksTimeOut)
+      );
     };
 
     function startTrading() {
       stocks.forEach((item, index) => {
-        stocksWatchTimeouts.push(
-          setTimeout(() => {
-            getAsset(item, stocks.length * 650);
-          }, 650 * index)
-        );
+        setTimeout(() => {
+          getAsset(item, stocks.length * 650);
+        }, 650 * index);
       });
     }
 
     function stopAllTasks() {
-      stocksWatchTimeouts.map((item: any) => {
+      stocksWatchIntervals.map((item: any) => {
         clearTimeout(item);
       });
       clearInterval(timeInterval);

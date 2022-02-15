@@ -33,7 +33,7 @@
   let working = false;
 
   async function startTrading() {
-    startBuyLowSellHighStrategy(stocks);
+    startBuyLowSellHighStrategy(stocks, alpaca);
   }
 
   setInterval(() => {
