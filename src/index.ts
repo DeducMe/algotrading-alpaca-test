@@ -1,26 +1,9 @@
 (function () {
-  var express = require("express");
-  var app = express();
+  const express = require("express");
+  const app = express();
+  const path = require("path");
 
-  app.listen(process.env.PORT || 8080);
-
-  app.get("/", (req: any, res: any) => {
-    alpaca.getAccount().then((account: any) => {
-      res.send(
-        `portfolio gains - ${(account.portfolio_value - 100000).toFixed(
-          2
-        )}      ||     ${(
-          ((account.portfolio_value - 100000) / 100000) *
-          100
-        ).toFixed(2)}%`
-      );
-    });
-  });
-
-  const {
-    main: startBuyLowSellHighStrategy,
-  } = require("./strategies/buyLowSellHigh");
-
+  //   const { main } = require("./main");
   const Alpaca = require("@alpacahq/alpaca-trade-api");
   const { keyId, secretKey } = require("./config");
   const alpaca = new Alpaca({
@@ -29,36 +12,53 @@
     paper: true,
   });
 
-  const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
-  let working = false;
+  app.listen(process.env.PORT || 8080);
+  let allowCrossDomain = function (req: any, res: any, next: any) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "*");
+    next();
+  };
+  app.use(allowCrossDomain);
+  app.use(
+    express.static(path.join(__dirname, "../alpaca-trading-front", "build"))
+  );
+  app.use(express.static("../alpaca-trading-front/public"));
 
-  async function startTrading() {
-    startBuyLowSellHighStrategy(stocks, alpaca);
-  }
+  app.get("/api/current", (req: any, res: any) => {
+    alpaca.getAccount().then((account: any) => {
+      res.send({
+        total: (account.portfolio_value - 100000).toFixed(2),
+        percent: (((account.portfolio_value - 100000) / 100000) * 100).toFixed(
+          2
+        ),
+      });
+    });
+  });
 
-  setInterval(() => {
-    const dateNow = new Date();
-    const finishDate = new Date();
-    const startDate = new Date();
+  app.get("/api/history", (req: any, res: any) => {
+    const result: {
+      timestamp: string;
+      equity: number;
+      profitLoss: number;
+    }[] = [];
 
-    finishDate.setHours(20, 55, 0);
-    startDate.setHours(14, 35, 0);
+    alpaca
+      .getPortfolioHistory({
+        period: "all",
+        timeframe: "15Min",
+      })
+      .then((item: any) => {
+        item.timestamp.forEach((el: any, index: number) => {
+          const newObj = {
+            timestamp: new Date(el * 1000).toISOString(),
+            equity: item.equity[index],
+            profitLoss: item.profit_loss[index],
+          };
+          result.push(newObj);
+        });
+        res.send(result);
+      });
+  });
 
-    const timeNow = dateNow.getTime();
-    const startTime = startDate.getTime();
-    const finishTime = finishDate.getTime();
-
-    if (timeNow >= startTime && timeNow < finishTime && !working) {
-      working = true;
-      startTrading();
-
-      console.log("trading started");
-    }
-    if (timeNow >= finishTime && working) {
-      alpaca.closeAllPositions();
-      working = false;
-
-      console.log("all positions closed");
-    }
-  }, 1000);
+  //   main();
 })();
