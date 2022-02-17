@@ -24,6 +24,10 @@
   );
   app.use(express.static("../alpaca-trading-front/public"));
 
+  app.get("/", (req: any, res: any) => {
+    res.sendFile(path.join(__dirname, "../alpaca-trading-front", "build"));
+  });
+
   app.get("/api/current", (req: any, res: any) => {
     alpaca.getAccount().then((account: any) => {
       res.send({
