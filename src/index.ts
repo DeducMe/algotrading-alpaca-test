@@ -3,7 +3,7 @@
   const app = express();
   const path = require("path");
 
-  //   const { main } = require("./main");
+  const { main } = require("./main");
   const Alpaca = require("@alpacahq/alpaca-trade-api");
   const { keyId, secretKey } = require("./config");
   const alpaca = new Alpaca({
@@ -64,5 +64,5 @@
       });
   });
 
-  //   main();
+  main();
 })();
