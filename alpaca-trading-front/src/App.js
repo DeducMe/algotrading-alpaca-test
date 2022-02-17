@@ -8,11 +8,11 @@ function App() {
 
   useEffect(() => {
     console.log("a");
-    fetch("http://localhost:8080/api/history")
+    fetch("https://trading-alpaca-app.herokuapp.com/api/history")
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
 
-    fetch("http://localhost:8080/api/current")
+    fetch("https://trading-alpaca-app.herokuapp.com/api/current")
       .then((res) => res.json())
       .then((res) => setCurrentGain(res));
   }, []);
