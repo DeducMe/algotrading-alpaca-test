@@ -10,15 +10,15 @@ function App() {
   const [currentGain, setCurrentGain] = useState();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/history")
+    fetch("https://trading-alpaca-app.herokuapp.com/api/history")
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
 
-    fetch("http://localhost:8080/api/history/today")
+    fetch("https://trading-alpaca-app.herokuapp.com/api/history/today")
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryToday(res));
 
-    fetch("http://localhost:8080/api/history/week")
+    fetch("https://trading-alpaca-app.herokuapp.com/api/history/week")
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryWeek(res));
 
