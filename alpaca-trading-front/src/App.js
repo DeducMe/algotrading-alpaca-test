@@ -12,19 +12,23 @@ function App() {
   console.log(portfolioHistory, portfolioHistoryToday, portfolioHistoryWeek);
 
   useEffect(() => {
-    fetch("https://trading-alpaca-app.herokuapp.com/api/history")
+    const isProd = true;
+    const url = isProd
+      ? "https://trading-alpaca-app.herokuapp.com/"
+      : "http://localhost:8080/";
+    fetch(`${url}api/history`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
 
-    fetch("https://trading-alpaca-app.herokuapp.com/api/history/today")
+    fetch(`${url}api/history/today`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryToday(res));
 
-    fetch("https://trading-alpaca-app.herokuapp.com/api/history/week")
+    fetch(`${url}api/history/week`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryWeek(res));
 
-    fetch("https://trading-alpaca-app.herokuapp.com/api/current")
+    fetch(`${url}api/current`)
       .then((res) => res.json())
       .then((res) => setCurrentGain(res));
   }, []);
@@ -50,6 +54,8 @@ function App() {
             return {
               percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
             };
+
+          return false;
         })}
       ></Chart>
       <h3>week</h3>
@@ -60,6 +66,8 @@ function App() {
             return {
               percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
             };
+
+          return false;
         })}
       ></Chart>
       <h3>day</h3>
@@ -71,6 +79,7 @@ function App() {
             return {
               percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
             };
+          return false;
         })}
       ></Chart>
 
