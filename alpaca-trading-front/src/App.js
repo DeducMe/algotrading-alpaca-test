@@ -12,7 +12,7 @@ function App() {
   console.log(portfolioHistory, portfolioHistoryToday, portfolioHistoryWeek);
 
   useEffect(() => {
-    const isProd = true;
+    const isProd = process.env.IS_PROD || false;
     const url = isProd
       ? "https://trading-alpaca-app.herokuapp.com/"
       : "http://localhost:8080/";

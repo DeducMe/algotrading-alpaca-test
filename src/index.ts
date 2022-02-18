@@ -7,8 +7,8 @@
   const Alpaca = require("@alpacahq/alpaca-trade-api");
   const { keyId, secretKey } = require("./config");
   const alpaca = new Alpaca({
-    keyId: keyId,
-    secretKey: secretKey,
+    keyId: process.env.KEY_ID || keyId,
+    secretKey: process.env.SECRET_KEY || secretKey,
     paper: true,
   });
 

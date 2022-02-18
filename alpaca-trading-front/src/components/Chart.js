@@ -26,6 +26,7 @@ export const Chart = ({ data }) => {
 
     return null;
   };
+
   return (
     <div style={{ height: "400px", width: "100%" }}>
       <ResponsiveContainer width="100%" height="100%">
