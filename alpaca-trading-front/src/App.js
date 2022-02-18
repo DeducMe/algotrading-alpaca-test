@@ -14,7 +14,7 @@ function App() {
   const [currentPositions, setCurrentPositions] = useState();
 
   useEffect(() => {
-    const isProd = process.env.IS_PROD || false;
+    const isProd = process.env.NODE_ENV === "production" || false;
     const url = isProd
       ? "https://trading-alpaca-app.herokuapp.com/"
       : "http://localhost:8080/";
