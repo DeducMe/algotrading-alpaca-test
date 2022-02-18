@@ -9,6 +9,8 @@ function App() {
 
   const [currentGain, setCurrentGain] = useState();
 
+  console.log(portfolioHistory, portfolioHistoryToday, portfolioHistoryWeek);
+
   useEffect(() => {
     fetch("https://trading-alpaca-app.herokuapp.com/api/history")
       .then((res) => res.json())
@@ -44,18 +46,20 @@ function App() {
       <h3>month</h3>
       <Chart
         data={portfolioHistory?.map((item) => {
-          return {
-            percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-          };
+          if (item.equity)
+            return {
+              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
+            };
         })}
       ></Chart>
       <h3>week</h3>
 
       <Chart
         data={portfolioHistoryWeek?.map((item) => {
-          return {
-            percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-          };
+          if (item.equity)
+            return {
+              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
+            };
         })}
       ></Chart>
       <h3>day</h3>
@@ -63,9 +67,10 @@ function App() {
       <Chart
         noDots
         data={portfolioHistoryToday?.map((item) => {
-          return {
-            percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-          };
+          if (item.equity)
+            return {
+              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
+            };
         })}
       ></Chart>
 

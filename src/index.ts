@@ -46,13 +46,9 @@
       profitLoss: number;
     }[] = [];
 
-    const nowDate = new Date();
-
     alpaca
       .getPortfolioHistory({
-        date_start: nowDate.getDate() - 1,
-        date_end: nowDate,
-        timeframe: "15Min",
+        timeframe: "5Min",
         period: "intraday",
         extended_hours: true,
       })

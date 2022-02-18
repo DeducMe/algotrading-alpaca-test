@@ -19,7 +19,7 @@ export const Chart = ({ data }) => {
         <div className="custom-tooltip">
           <p className={`label ${payload[0].value >= 0 ? "green" : "red"}`}>{`${
             payload[0].value >= 0 ? "+" : ""
-          }${payload[0].value}`}</p>
+          }${payload[0].value}%`}</p>
         </div>
       );
     }
