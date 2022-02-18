@@ -1,0 +1,34 @@
+* {
+  font-size: calc(8px + 2vmin);
+  color: white;
+}
+
+.sup-text {
+  font-size: calc(6px + 2vmin);
+
+  color: #c1c1c1;
+}
+
+p {
+  margin: 10px 0 10px 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.green {
+  color: #16d316;
+}
+
+.red {
+  color: #ff0000;
+}

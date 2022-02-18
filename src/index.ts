@@ -28,6 +28,32 @@
     res.sendFile(path.join(__dirname, "../alpaca-trading-front", "build"));
   });
 
+  app.get("/api/positions", (req: any, res: any) => {
+    alpaca.getPositions().then((data: any) => {
+      res.send(
+        data.map((item: any) => {
+          const {
+            symbol,
+            qty,
+            side,
+            avg_entry_price,
+            current_price,
+            market_value,
+          } = item;
+
+          return {
+            symbol,
+            qty,
+            side,
+            entry_price: Number(avg_entry_price).toFixed(2),
+            current_price,
+            market_value,
+          };
+        })
+      );
+    });
+  });
+
   app.get("/api/current", (req: any, res: any) => {
     alpaca.getAccount().then((account: any) => {
       res.send({
@@ -49,7 +75,7 @@
     alpaca
       .getPortfolioHistory({
         timeframe: "5Min",
-        period: "intraday",
+        period: "1D",
         extended_hours: true,
       })
       .then((item: any) => {
@@ -73,11 +99,14 @@
     }[] = [];
 
     // const nowDate = new Date();
+    // const endDate = new Date();
+    // endDate.setDate(new Date().getDate() - 5);
 
     alpaca
       .getPortfolioHistory({
         timeframe: "1H",
         period: "1W",
+        // date_start: endDate.toISOString().slice(0, 10),
         extended_hours: true,
       })
       .then((item: any) => {

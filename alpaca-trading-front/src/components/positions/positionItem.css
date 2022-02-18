@@ -1,0 +1,14 @@
+.positions-container {
+  width: 100%;
+  max-width: 900px;
+  display: table;
+  margin-bottom: 30px;
+}
+
+.position-col {
+  display: table-row;
+}
+
+.position-col-item {
+  display: table-cell;
+}

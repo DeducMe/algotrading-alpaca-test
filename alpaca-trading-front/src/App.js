@@ -1,6 +1,9 @@
 import "./App.css";
+import "./global.css";
+
 import { useEffect, useState } from "react";
-import { Chart } from "./components/Chart";
+import { Chart } from "./components/chart/Chart";
+import Positions from "./components/positions/Positions";
 
 function App() {
   const [portfolioHistory, setPortfolioHistory] = useState();
@@ -8,8 +11,7 @@ function App() {
   const [portfolioHistoryWeek, setPortfolioHistoryWeek] = useState();
 
   const [currentGain, setCurrentGain] = useState();
-
-  console.log(portfolioHistory, portfolioHistoryToday, portfolioHistoryWeek);
+  const [currentPositions, setCurrentPositions] = useState();
 
   useEffect(() => {
     const isProd = process.env.IS_PROD || false;
@@ -31,7 +33,18 @@ function App() {
     fetch(`${url}api/current`)
       .then((res) => res.json())
       .then((res) => setCurrentGain(res));
+
+    fetch(`${url}api/positions`)
+      .then((res) => res.json())
+      .then((res) => setCurrentPositions(res));
   }, []);
+
+  useEffect(() => {
+    console.log(
+      "Вот блять посмотри на эту суку, я ебался весь день, нихуя не понял в чем проблема. ААААААААААААААА"
+    );
+    console.log(portfolioHistoryWeek);
+  }, [portfolioHistoryWeek]);
 
   return (
     <div className="App">
@@ -47,47 +60,60 @@ function App() {
           </div>
         </>
       )}
-      <h3>month</h3>
-      <Chart
-        data={portfolioHistory?.map((item) => {
-          if (item.equity)
-            return {
-              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-            };
+      <div className="flex chart-container">
+        <div className="chart-block">
+          <h3 className="text-align-center">month</h3>
+          <Chart
+            data={portfolioHistory?.map((item) => {
+              if (item.equity)
+                return {
+                  percent: Number(
+                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                  ),
+                };
 
-          return false;
-        })}
-      ></Chart>
-      <h3>week</h3>
+              return false;
+            })}
+          ></Chart>
+        </div>
+        <div className="chart-block">
+          <h3 className="text-align-center">week</h3>
+          <p className="sup-text">
+            тут какая-то залупа с графиком, потому что альпака не хочет мне фул
+            данные возращать, скамина ебаная
+          </p>
 
-      <Chart
-        data={portfolioHistoryWeek?.map((item) => {
-          if (item.equity)
-            return {
-              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-            };
+          <Chart
+            data={portfolioHistoryWeek?.map((item) => {
+              if (item.equity)
+                return {
+                  percent: Number(
+                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                  ),
+                };
 
-          return false;
-        })}
-      ></Chart>
-      <h3>day</h3>
+              return false;
+            })}
+          ></Chart>
+        </div>
+        <div className="chart-block">
+          <h3 className="text-align-center">day</h3>
 
-      <Chart
-        noDots
-        data={portfolioHistoryToday?.map((item) => {
-          if (item.equity)
-            return {
-              percent: (((item.equity - 100000) / 100000) * 100).toFixed(2),
-            };
-          return false;
-        })}
-      ></Chart>
-
-      <div className="flex">
-        {/* {portfolioHistory?.map((item) => (
-          <div className="portfolio-history-el">{item.equity}</div>
-        ))} */}
+          <Chart
+            noDots
+            data={portfolioHistoryToday?.map((item) => {
+              if (item.equity)
+                return {
+                  percent: Number(
+                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                  ),
+                };
+              return false;
+            })}
+          ></Chart>
+        </div>
       </div>
+      {currentPositions && <Positions positions={currentPositions} />}
     </div>
   );
 }

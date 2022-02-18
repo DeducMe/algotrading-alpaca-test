@@ -26,10 +26,9 @@ export const Chart = ({ data }) => {
 
     return null;
   };
-
   return (
-    <div style={{ height: "400px", width: "100%" }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div style={{ height: "400px", width: "100%", maxWidth: "500px" }}>
+      <ResponsiveContainer width="100%" height={400}>
         <LineChart
           width={500}
           height={300}

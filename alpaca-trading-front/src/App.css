@@ -5,20 +5,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-p {
-  margin: 10px 0 10px 0;
-}
-
-.flex {
-  display: flex;
-}
-
-.justify-between {
-  justify-content: space-between;
 }
 
 .current-gain {
@@ -29,14 +15,19 @@ p {
   margin-left: 20px;
 }
 
-.current-gain .green {
-  color: #16d316;
-}
-
-.current-gain .red {
-  color: #ff0000;
-}
-
 .portfolio-history-el {
   margin-left: 15px;
+}
+
+.chart-container {
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chart-block {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
 }
