@@ -39,17 +39,22 @@
     });
   });
 
-  app.get("/api/history", (req: any, res: any) => {
+  app.get("/api/history/today", (req: any, res: any) => {
     const result: {
       timestamp: string;
       equity: number;
       profitLoss: number;
     }[] = [];
 
+    const nowDate = new Date();
+
     alpaca
       .getPortfolioHistory({
-        period: "all",
+        date_start: nowDate.getDate() - 1,
+        date_end: nowDate,
         timeframe: "15Min",
+        period: "intraday",
+        extended_hours: true,
       })
       .then((item: any) => {
         item.timestamp.forEach((el: any, index: number) => {
@@ -62,6 +67,64 @@
         });
         res.send(result);
       });
+  });
+
+  app.get("/api/history/week", (req: any, res: any) => {
+    const result: {
+      timestamp: string;
+      equity: number;
+      profitLoss: number;
+    }[] = [];
+
+    // const nowDate = new Date();
+
+    alpaca
+      .getPortfolioHistory({
+        timeframe: "1H",
+        period: "1W",
+        extended_hours: true,
+      })
+      .then((item: any) => {
+        item.timestamp.forEach((el: any, index: number) => {
+          const newObj = {
+            timestamp: new Date(el * 1000).toISOString(),
+            equity: item.equity[index],
+            profitLoss: item.profit_loss[index],
+          };
+          result.push(newObj);
+        });
+        res.send(result);
+      })
+      .catch((err: any) => console.log(err));
+  });
+
+  app.get("/api/history", (req: any, res: any) => {
+    const result: {
+      timestamp: string;
+      equity: number;
+      profitLoss: number;
+    }[] = [];
+
+    // const nowDate = new Date();
+
+    alpaca
+      .getPortfolioHistory({
+        timeframe: "1D",
+        period: "1M",
+        extended_hours: true,
+      })
+      .then((item: any) => {
+        item.timestamp.forEach((el: any, index: number) => {
+          const newObj = {
+            timestamp: new Date(el * 1000).toISOString(),
+            equity: item.equity[index],
+            profitLoss: item.profit_loss[index],
+          };
+          result.push(newObj);
+        });
+        res.send(result);
+      })
+      .catch((err: any) => console.log(err));
   });
 
   main();

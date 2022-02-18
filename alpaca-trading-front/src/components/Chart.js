@@ -27,9 +27,7 @@ export const Chart = ({ data }) => {
     return null;
   };
   return (
-    <div
-      style={{ height: "400px", width: "calc(100vw + 45px)", marginLeft: -45 }}
-    >
+    <div style={{ height: "400px", width: "100%" }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={500}
@@ -49,15 +47,14 @@ export const Chart = ({ data }) => {
             verticalFill={["#555555", "#444444"]}
             fillOpacity={0.2}
           />
-          <XAxis dataKey="name" />
-          <YAxis />
+          <XAxis dataKey="percent" minTickGap={20} />
           <Tooltip content={CustomTooltip} />
-          <Legend />
           <Line
             type="monotone"
             dataKey="percent"
             stroke="#8884d8"
-            activeDot={{ r: 8 }}
+            dot={false}
+            activeDot={{ r: 5 }}
           />
         </LineChart>
       </ResponsiveContainer>
