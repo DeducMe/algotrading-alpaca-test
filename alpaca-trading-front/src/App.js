@@ -1,9 +1,14 @@
 import "./App.css";
 import "./global.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chart } from "./components/chart/Chart";
 import Positions from "./components/positions/Positions";
+
+const isProd = process.env.NODE_ENV === "production" || false;
+const url = isProd
+  ? "https://trading-alpaca-app.herokuapp.com/"
+  : "http://localhost:8080/";
 
 function App() {
   const [portfolioHistory, setPortfolioHistory] = useState();
@@ -12,12 +17,36 @@ function App() {
 
   const [currentGain, setCurrentGain] = useState();
   const [currentPositions, setCurrentPositions] = useState();
+  const [passwordCorrect, setPasswordCorrect] = useState("");
+  const [disablePositionsClose, setDisablePositionsClose] = useState(false);
+
+  const passwordRef = useRef(null);
+
+  function onPasswordInput() {
+    if (passwordRef.current.value === "vanya_durak") {
+      setPasswordCorrect(true);
+      return;
+    }
+
+    setPasswordCorrect(false);
+  }
+
+  function disablePositions(disable) {
+    setDisablePositionsClose(disable);
+    fetch(`${url}api/close_positions`, {
+      method: "post",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({ disable }),
+    })
+      .then((res) => res.json())
+      .then((res) => console.log(res));
+  }
 
   useEffect(() => {
-    const isProd = process.env.NODE_ENV === "production" || false;
-    const url = isProd
-      ? "https://trading-alpaca-app.herokuapp.com/"
-      : "http://localhost:8080/";
     fetch(`${url}api/history`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
@@ -60,6 +89,22 @@ function App() {
           </div>
         </>
       )}
+      <input
+        className="password-input"
+        onChange={onPasswordInput}
+        ref={passwordRef}
+      ></input>
+      {passwordCorrect && (
+        <div>
+          <p>Position close at night</p>
+          <button
+            onClick={() => disablePositions(!disablePositionsClose)}
+            className="button-default"
+          >
+            {disablePositionsClose ? "enable" : "disable"}
+          </button>
+        </div>
+      )}
       <div className="flex chart-container">
         <div className="chart-block">
           <h3 className="text-align-center">month</h3>
@@ -100,7 +145,6 @@ function App() {
           <h3 className="text-align-center">day</h3>
 
           <Chart
-            noDots
             data={portfolioHistoryToday?.map((item) => {
               if (item.equity)
                 return {

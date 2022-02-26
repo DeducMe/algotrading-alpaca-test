@@ -12,7 +12,7 @@ import {
 
 import "./chart.css";
 
-export const Chart = ({ data }) => {
+export const Chart = ({ data, noDots }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (

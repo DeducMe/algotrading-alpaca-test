@@ -6,6 +6,7 @@
   const { main } = require("./main");
   const Alpaca = require("@alpacahq/alpaca-trade-api");
   const { keyId, secretKey } = require("./config");
+  const fs = require("fs");
   const alpaca = new Alpaca({
     keyId: process.env.KEY_ID || keyId,
     secretKey: process.env.SECRET_KEY || secretKey,
@@ -27,6 +28,8 @@
   app.get("*", (req: any, res: any) => {
     res.sendFile(path.join(__dirname, "../alpaca-trading-front", "build"));
   });
+
+  app.use(express.json());
 
   app.get("/api/positions", (req: any, res: any) => {
     alpaca.getPositions().then((data: any) => {
@@ -152,5 +155,22 @@
       .catch((err: any) => console.log(err));
   });
 
-  main();
+  app.post("/api/close_positions", (req: any, res: any) => {
+    console.log(req.body.disable);
+
+    let content = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "./config.json"), "utf8")
+    );
+    content.closePositionsOnNight = req.body.disable;
+
+    fs.writeFileSync(
+      path.join(__dirname, "./config.json"),
+      JSON.stringify(content)
+    );
+
+    res.send({ disabled: req.body.disable });
+  });
+
+  const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
+  main(stocks, true);
 })();

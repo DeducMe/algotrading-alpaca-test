@@ -4,6 +4,8 @@ import "./positionItem.css";
 import "../../global.css";
 
 export default function Positions({ positions }) {
+  if (!positions.length) return <p>There are no positions</p>;
+
   return (
     <div className="positions-container">
       <div className="flex justify-between position-col">
@@ -12,6 +14,7 @@ export default function Positions({ positions }) {
         <p className="position-col-item sup-text">Entry</p>
         <p className="position-col-item sup-text">Current</p>
         <p className="position-col-item sup-text">Profit</p>
+        <p className="position-col-item sup-text">Position</p>
       </div>
 
       {positions.map((item) => (

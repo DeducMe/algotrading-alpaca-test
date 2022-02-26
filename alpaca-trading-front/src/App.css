@@ -31,3 +31,16 @@
   width: 100%;
   max-width: 500px;
 }
+
+.password-input {
+  background-color: transparent;
+  border: none;
+  cursor: default;
+}
+
+.button-default {
+  background-color: transparent;
+  padding: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+}

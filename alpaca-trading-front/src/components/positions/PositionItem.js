@@ -3,8 +3,12 @@ import React from "react";
 export default function PositionItem({ data }) {
   const { symbol, qty, side, entry_price, current_price, market_value } = data;
 
+  console.log(side, "side in position");
+
   const profitPercent = (
-    ((Number(entry_price) - Number(current_price)) / Number(current_price)) *
+    (side === "long"
+      ? (Number(entry_price) - Number(current_price)) / Number(current_price)
+      : (Number(current_price) - Number(entry_price)) / Number(entry_price)) *
     100
   ).toFixed(2);
   return (
@@ -21,6 +25,7 @@ export default function PositionItem({ data }) {
         {profitPercent >= 0 && "+"}
         {profitPercent}%
       </p>
+      <p className={`position-col-item text-align-center`}>{market_value}</p>
     </div>
   );
 }

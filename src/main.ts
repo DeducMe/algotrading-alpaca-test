@@ -1,10 +1,15 @@
 (function () {
-  function main() {
+  function main(stocks: string[], disableTraiding: boolean) {
+    if (disableTraiding) return;
+
     const {
       main: startBuyLowSellHighStrategy,
     } = require("./strategies/buyLowSellHigh");
 
     const Alpaca = require("@alpacahq/alpaca-trade-api");
+    const path = require("path");
+    const fs = require("fs");
+
     const { keyId, secretKey } = require("./config");
     const alpaca = new Alpaca({
       keyId: keyId,
@@ -12,7 +17,6 @@
       paper: true,
     });
 
-    const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
     let working = false;
 
     async function startTrading() {
@@ -38,10 +42,16 @@
         console.log("trading started");
       }
       if (timeNow >= finishTime && working) {
-        alpaca.closeAllPositions();
-        working = false;
+        let content = JSON.parse(
+          fs.readFileSync(path.join(__dirname, "./config.json"), "utf8")
+        );
+        if (content.closePositionsOnNight) {
+          alpaca.closeAllPositions();
+          console.log("all positions closed");
+        }
 
-        console.log("all positions closed");
+        working = false;
+        console.log("trading finished");
       }
     }, 1000);
   }
