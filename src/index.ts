@@ -172,5 +172,5 @@
   });
 
   const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
-  main(stocks, true);
+  main(stocks, false);
 })();
