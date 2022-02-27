@@ -70,7 +70,7 @@
 
   app.get("/api/history/today", (req: any, res: any) => {
     const result: {
-      timestamp: string;
+      timestamp: Date;
       equity: number;
       profitLoss: number;
     }[] = [];
@@ -84,7 +84,7 @@
       .then((item: any) => {
         item.timestamp.forEach((el: any, index: number) => {
           const newObj = {
-            timestamp: new Date(el * 1000).toISOString(),
+            timestamp: new Date(el * 1000),
             equity: item.equity[index],
             profitLoss: item.profit_loss[index],
           };
@@ -96,26 +96,26 @@
 
   app.get("/api/history/week", (req: any, res: any) => {
     const result: {
-      timestamp: string;
+      timestamp: Date;
       equity: number;
       profitLoss: number;
     }[] = [];
 
     // const nowDate = new Date();
-    // const endDate = new Date();
-    // endDate.setDate(new Date().getDate() - 5);
+    const endDate = new Date();
+    endDate.setDate(new Date().getDate() - 7);
+    endDate.setMinutes(new Date().getMinutes() - 1);
 
     alpaca
       .getPortfolioHistory({
-        timeframe: "1H",
-        period: "1W",
-        // date_start: endDate.toISOString().slice(0, 10),
+        timeframe: "15Min",
+        date_start: endDate.toISOString().slice(0, 10),
         extended_hours: true,
       })
       .then((item: any) => {
         item.timestamp.forEach((el: any, index: number) => {
           const newObj = {
-            timestamp: new Date(el * 1000).toISOString(),
+            timestamp: new Date(el * 1000),
             equity: item.equity[index],
             profitLoss: item.profit_loss[index],
           };
@@ -128,7 +128,7 @@
 
   app.get("/api/history", (req: any, res: any) => {
     const result: {
-      timestamp: string;
+      timestamp: Date;
       equity: number;
       profitLoss: number;
     }[] = [];
@@ -144,7 +144,7 @@
       .then((item: any) => {
         item.timestamp.forEach((el: any, index: number) => {
           const newObj = {
-            timestamp: new Date(el * 1000).toISOString(),
+            timestamp: new Date(el * 1000),
             equity: item.equity[index],
             profitLoss: item.profit_loss[index],
           };
@@ -153,6 +153,13 @@
         res.send(result);
       })
       .catch((err: any) => console.log(err));
+  });
+
+  app.get("/api/close_positions", (req: any, res: any) => {
+    let content = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "../public/config.json"), "utf8")
+    );
+    res.send({ disabled: content.closePositionsOnNight });
   });
 
   app.post("/api/close_positions", (req: any, res: any) => {

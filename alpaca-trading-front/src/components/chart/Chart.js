@@ -12,7 +12,8 @@ import {
 
 import "./chart.css";
 
-export const Chart = ({ data, noDots }) => {
+export const Chart = ({ data, minTickGap }) => {
+  console.log(data, "chart");
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -47,7 +48,7 @@ export const Chart = ({ data, noDots }) => {
             verticalFill={["#555555", "#444444"]}
             fillOpacity={0.2}
           />
-          <XAxis dataKey="percent" minTickGap={20} />
+          <XAxis dataKey="timestamp" minTickGap={minTickGap} />
           <Tooltip content={CustomTooltip} />
           <Line
             type="monotone"
