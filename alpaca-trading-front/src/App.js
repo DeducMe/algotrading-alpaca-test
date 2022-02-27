@@ -105,7 +105,7 @@ function App() {
         onChange={onPasswordInput}
         ref={passwordRef}
       ></input>
-      {settingsLoaded && (
+      {passwordCorrect && settingsLoaded && (
         <div>
           <p>Position close at night</p>
           <button
