@@ -156,15 +156,13 @@
   });
 
   app.post("/api/close_positions", (req: any, res: any) => {
-    console.log(req.body.disable);
-
     let content = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "./config.json"), "utf8")
+      fs.readFileSync(path.join(__dirname, "../public/config.json"), "utf8")
     );
     content.closePositionsOnNight = req.body.disable;
 
     fs.writeFileSync(
-      path.join(__dirname, "./config.json"),
+      path.join(__dirname, "../public/config.json"),
       JSON.stringify(content)
     );
 
@@ -172,5 +170,5 @@
   });
 
   const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
-  main(stocks, false);
+  main(stocks, true);
 })();
