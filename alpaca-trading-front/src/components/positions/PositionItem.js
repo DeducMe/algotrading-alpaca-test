@@ -6,7 +6,7 @@ export default function PositionItem({ data }) {
   console.log(side, "side in position");
 
   const profitPercent = (
-    (side === "long"
+    (side === "short"
       ? (Number(entry_price) - Number(current_price)) / Number(current_price)
       : (Number(current_price) - Number(entry_price)) / Number(entry_price)) *
     100
