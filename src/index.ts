@@ -1,12 +1,16 @@
-(function () {
-  const express = require("express");
-  const app = express();
-  const path = require("path");
+import { getPortfolioHistory } from './queries/getQueries';
 
-  const { main } = require("./main");
-  const Alpaca = require("@alpacahq/alpaca-trade-api");
-  const { keyId, secretKey } = require("./config");
-  const fs = require("fs");
+(function () {
+  const express = require('express');
+  const app = express();
+  const path = require('path');
+  const { getPositions, getAccount } = require('./queries/getQueries');
+  const { recieverAlpaca } = require('./queries/common');
+
+  const { main, testWebsockets } = require('./main');
+  const Alpaca = require('@alpacahq/alpaca-trade-api');
+  const { keyId, secretKey } = require('./config');
+  const fs = require('fs');
   const alpaca = new Alpaca({
     keyId: process.env.KEY_ID || keyId,
     secretKey: process.env.SECRET_KEY || secretKey,
@@ -14,168 +18,56 @@
   });
 
   app.listen(process.env.PORT || 8080);
-  let allowCrossDomain = function (req: any, res: any, next: any) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "*");
+  const allowCrossDomain = function (req: any, res: any, next: any) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
     next();
   };
   app.use(allowCrossDomain);
   app.use(
-    express.static(path.join(__dirname, "../alpaca-trading-front", "build"))
+    express.static(path.join(__dirname, '../alpaca-trading-front', 'build')),
   );
-  app.use(express.static("../alpaca-trading-front/public"));
+  app.use(express.static('../alpaca-trading-front/public'));
 
-  app.get("*", (req: any, res: any) => {
-    res.sendFile(path.join(__dirname, "../alpaca-trading-front", "build"));
+  app.get('*', (req: any, res: any) => {
+    res.sendFile(path.join(__dirname, '../alpaca-trading-front', 'build'));
   });
 
   app.use(express.json());
 
-  app.get("/api/positions", (req: any, res: any) => {
-    alpaca.getPositions().then((data: any) => {
-      res.send(
-        data.map((item: any) => {
-          const {
-            symbol,
-            qty,
-            side,
-            avg_entry_price,
-            current_price,
-            market_value,
-          } = item;
+  app.get('/api/positions', (req: any, res: any) => recieverAlpaca(req, res, getPositions, alpaca));
 
-          return {
-            symbol,
-            qty,
-            side,
-            entry_price: Number(avg_entry_price).toFixed(2),
-            current_price,
-            market_value,
-          };
-        })
-      );
-    });
+  app.get('/api/current', (req: any, res: any) => {
+    recieverAlpaca(req, res, getAccount, alpaca);
   });
-
-  app.get("/api/current", (req: any, res: any) => {
-    alpaca.getAccount().then((account: any) => {
-      res.send({
-        total: (account.portfolio_value - 100000).toFixed(2),
-        percent: (((account.portfolio_value - 100000) / 100000) * 100).toFixed(
-          2
-        ),
-      });
-    });
-  });
-
-  app.get("/api/history/today", (req: any, res: any) => {
-    const result: {
-      timestamp: Date;
-      equity: number;
-      profitLoss: number;
-    }[] = [];
-
-    alpaca
-      .getPortfolioHistory({
-        timeframe: "5Min",
-        period: "1D",
-        extended_hours: true,
-      })
-      .then((item: any) => {
-        item.timestamp.forEach((el: any, index: number) => {
-          const newObj = {
-            timestamp: new Date(el * 1000),
-            equity: item.equity[index],
-            profitLoss: item.profit_loss[index],
-          };
-          result.push(newObj);
-        });
-        res.send(result);
-      });
-  });
-
-  app.get("/api/history/week", (req: any, res: any) => {
-    const result: {
-      timestamp: Date;
-      equity: number;
-      profitLoss: number;
-    }[] = [];
-
-    // const nowDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(new Date().getDate() - 7);
-    endDate.setMinutes(new Date().getMinutes() - 1);
-
-    alpaca
-      .getPortfolioHistory({
-        timeframe: "15Min",
-        date_start: endDate.toISOString().slice(0, 10),
-        extended_hours: true,
-      })
-      .then((item: any) => {
-        item.timestamp.forEach((el: any, index: number) => {
-          const newObj = {
-            timestamp: new Date(el * 1000),
-            equity: item.equity[index],
-            profitLoss: item.profit_loss[index],
-          };
-          result.push(newObj);
-        });
-        res.send(result);
-      })
-      .catch((err: any) => console.log(err));
-  });
-
-  app.get("/api/history", (req: any, res: any) => {
-    const result: {
-      timestamp: Date;
-      equity: number;
-      profitLoss: number;
-    }[] = [];
-
-    // const nowDate = new Date();
-
-    alpaca
-      .getPortfolioHistory({
-        timeframe: "1D",
-        period: "1M",
-        extended_hours: true,
-      })
-      .then((item: any) => {
-        item.timestamp.forEach((el: any, index: number) => {
-          const newObj = {
-            timestamp: new Date(el * 1000),
-            equity: item.equity[index],
-            profitLoss: item.profit_loss[index],
-          };
-          result.push(newObj);
-        });
-        res.send(result);
-      })
-      .catch((err: any) => console.log(err));
-  });
-
-  app.get("/api/close_positions", (req: any, res: any) => {
-    let content = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "../public/config.json"), "utf8")
+  app.get(
+    '/api/history/:stamp_timing/:timeframe/:period',
+    (req: any, res: any) => {
+      recieverAlpaca(req, res, getPortfolioHistory, alpaca);
+    },
+  );
+  app.get('/api/close_positions', (req: any, res: any) => {
+    const content = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../public/config.json'), 'utf8'),
     );
     res.send({ disabled: content.closePositionsOnNight });
   });
 
-  app.post("/api/close_positions", (req: any, res: any) => {
-    let content = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "../public/config.json"), "utf8")
+  app.post('/api/close_positions', (req: any, res: any) => {
+    const content = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../public/config.json'), 'utf8'),
     );
     content.closePositionsOnNight = req.body.disable;
 
     fs.writeFileSync(
-      path.join(__dirname, "../public/config.json"),
-      JSON.stringify(content)
+      path.join(__dirname, '../public/config.json'),
+      JSON.stringify(content),
     );
 
     res.send({ disabled: req.body.disable });
   });
 
-  const stocks = ["AAPL", "MSFT", "TSLA", "AMD", "BABA", "TAL", "COIN"];
+  const stocks = ['AAPL', 'MSFT', 'TSLA', 'AMD', 'BABA', 'TAL', 'COIN'];
   main(stocks, false);
-})();
+  testWebsockets(alpaca);
+}());

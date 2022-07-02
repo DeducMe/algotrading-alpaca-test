@@ -1,19 +1,94 @@
 (function () {
+  function testWebsockets(alpaca: any) {
+    /**
+     * This example shows how to use the Alpaca Data V2 websocket to subscribe to events.
+     * The socket is available under the `data_steam_v2` property on an Alpaca instance.
+     * There are separate functions for subscribing (and unsubscribing) to trades, quotes and bars as seen below.
+     */
+
+    class DataStream {
+      subscriptions: {
+        trades: any[];
+        quotes: any[];
+        bars: any[];
+        dailyBars: any[];
+        statuses: any[];
+        lulds: any[];
+        cancelErrors: any[];
+        corrections: any[];
+      };
+
+      constructor() {
+        const socket = alpaca.data_stream_v2;
+
+        this.subscriptions = socket.session.subscriptions;
+
+        socket.onConnect(() => {
+          console.log('Connected');
+          socket.subscribeForQuotes(['AAPL']);
+          socket.subscribeForTrades(['FB']);
+          socket.subscribeForBars(['SPY']);
+          socket.subscribeForStatuses(['*']);
+        });
+
+        socket.onError((err: any) => {
+          console.log(err);
+        });
+
+        socket.onStockTrade((trade: any) => {
+          console.log(trade);
+        });
+
+        socket.onStockQuote((quote: any) => {
+          console.log(quote);
+        });
+
+        socket.onStockBar((bar: any) => {
+          console.log(bar);
+        });
+
+        socket.onStatuses((s: any) => {
+          console.log(s);
+        });
+
+        socket.onStateChange((state: any) => {
+          console.log(state);
+        });
+
+        socket.onDisconnect(() => {
+          console.log('Disconnected');
+        });
+
+        socket.connect();
+
+        // unsubscribe from FB after a second
+        setTimeout(() => {
+          socket.unsubscribeFromTrades(['FB']);
+          console.log('unsubcribed');
+        }, 1000);
+      }
+    }
+
+    const stream = new DataStream();
+
+    console.log(stream.subscriptions);
+  }
+
   function main(stocks: string[], disableTraiding: boolean) {
     if (disableTraiding) return;
 
     const {
       main: startBuyLowSellHighStrategy,
-    } = require("./strategies/buyLowSellHigh");
+    } = require('./strategies/buyLowSellHigh');
 
-    const Alpaca = require("@alpacahq/alpaca-trade-api");
-    const path = require("path");
-    const fs = require("fs");
+    const Alpaca = require('@alpacahq/alpaca-trade-api');
+    const path = require('path');
+    const fs = require('fs');
 
-    const { keyId, secretKey } = require("./config");
+    const { keyId, secretKey } = require('./config');
     const alpaca = new Alpaca({
-      keyId: keyId,
-      secretKey: secretKey,
+      keyId,
+      secretKey,
       paper: true,
     });
 
@@ -39,22 +114,22 @@
         working = true;
         startTrading();
 
-        console.log("trading started");
+        console.log('trading started');
       }
       if (timeNow >= finishTime && working) {
-        let content = JSON.parse(
-          fs.readFileSync(path.join(__dirname, "./config.json"), "utf8")
+        const content = JSON.parse(
+          fs.readFileSync(path.join(__dirname, './config.json'), 'utf8'),
         );
         if (content.closePositionsOnNight) {
           alpaca.closeAllPositions();
-          console.log("all positions closed");
+          console.log('all positions closed');
         }
 
         working = false;
-        console.log("trading finished");
+        console.log('trading finished');
       }
     }, 1000);
   }
 
-  module.exports = { main };
-})();
+  module.exports = { main, testWebsockets };
+}());

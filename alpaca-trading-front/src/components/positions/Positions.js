@@ -5,7 +5,7 @@ import "../../global.css";
 
 export default function Positions({ positions }) {
   if (!positions.length) return <p>There are no positions</p>;
-
+console.log(positions)
   return (
     <div className="positions-container">
       <div className="flex justify-between position-col">

@@ -52,15 +52,18 @@ function App() {
   }, [disablePositionsClose]);
 
   useEffect(() => {
-    fetch(`${url}api/history`)
+    fetch(`${url}api/history/1M/1D/true`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
 
-    fetch(`${url}api/history/today`)
+    fetch(`${url}api/history/1D/5Min/true`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryToday(res));
 
-    fetch(`${url}api/history/week`)
+    const weekDate = new Date();
+    weekDate.setDate(new Date().getDate() - 7);
+    const weekDateStringified = weekDate.toISOString().slice(0, 10);
+    fetch(`${url}api/history/${weekDateStringified}/15Min/false`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryWeek(res));
 

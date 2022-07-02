@@ -13,7 +13,6 @@ import {
 import "./chart.css";
 
 export const Chart = ({ data, minTickGap }) => {
-  console.log(data, "chart");
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (

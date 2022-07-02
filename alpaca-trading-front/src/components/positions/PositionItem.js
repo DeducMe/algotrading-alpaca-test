@@ -3,8 +3,6 @@ import React from "react";
 export default function PositionItem({ data }) {
   const { symbol, qty, side, entry_price, current_price, market_value } = data;
 
-  console.log(side, "side in position");
-
   const profitPercent = (
     (side === "short"
       ? (Number(entry_price) - Number(current_price)) / Number(current_price)
