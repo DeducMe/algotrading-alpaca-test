@@ -24,7 +24,7 @@
         this.subscriptions = socket.session.subscriptions;
 
         socket.onConnect(() => {
-          console.log('Connected');
+          console.log('Connected!');
           socket.subscribeForQuotes(['AAPL']);
           socket.subscribeForTrades(['FB']);
           socket.subscribeForBars(['SPY']);

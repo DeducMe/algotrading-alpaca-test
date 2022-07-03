@@ -1,6 +1,7 @@
 import { getPortfolioHistory } from './queries/getQueries';
 
 (function () {
+  if (process.env.DISABLE) return;
   const express = require('express');
   const app = express();
   const path = require('path');
