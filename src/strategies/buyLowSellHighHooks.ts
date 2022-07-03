@@ -76,8 +76,6 @@ class TradingClass {
         if (responses.length) {
           const ticker = responses[0].Symbol;
 
-          console.log(ticker);
-
           this.bars[ticker].push(...responses.map((item:any) => ({
             highPrice: item.High,
             lowPrice: item.Low,
@@ -90,7 +88,6 @@ class TradingClass {
         this.bars[ticker].length = 20;
         this.bars[ticker] = this.bars[ticker].filter((item:any) => !!item);
 
-        console.log(this.bars[ticker].length);
         calculateLastLowestHighest(ticker);
       });
 
@@ -132,7 +129,7 @@ class TradingClass {
       const lastTrade = trade.Price;
       const ticker = trade.Symbol;
 
-      if (this.awaitForNextBuyBar) return;
+      if (this.awaitForNextBuyBar[ticker]) return;
 
       if (this.lowestHighest[ticker].lowPrice > lastTrade) {
         this.awaitForNextBuyBar[ticker] = true;
@@ -146,7 +143,7 @@ class TradingClass {
         );
       }
 
-      if (this.awaitForNextSellBar) return;
+      if (this.awaitForNextSellBar[ticker]) return;
 
       if (this.lowestHighest[ticker].highPrice < lastTrade) {
         this.awaitForNextBuyBar[ticker] = false;
