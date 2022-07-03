@@ -27,7 +27,7 @@ export const setTrade = async (
 
     console.log({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : Math.round((account.cash * 0.05) / price) || 0.001,
+      qty: closePosition ? openedPosition.qty : (Math.round((account.cash * 0.05) / price) || 0.001),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
