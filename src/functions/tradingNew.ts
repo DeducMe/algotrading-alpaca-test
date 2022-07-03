@@ -25,6 +25,14 @@ export const setTrade = async (
     const openedPosition = positions.find((item:any) => item.symbol === ticker);
     const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
 
+    console.log({
+      symbol: ticker,
+      qty: closePosition ? openedPosition.qty : (account.cash * 0.05) / price,
+      side: tradeWay,
+      type: 'market',
+      time_in_force: 'gtc',
+    });
+
     await alpaca.createOrder({
       symbol: ticker,
       qty: closePosition ? openedPosition.qty : (account.cash * 0.1) / price,

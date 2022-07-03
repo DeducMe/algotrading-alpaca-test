@@ -36,6 +36,7 @@ class TradingClass {
   readyToTrade:boolean;
 
   constructor({ alpaca, socket, tickers } :any) {
+    console.log(tickers);
     // setTrade('BTCUSD', 'buy', 19225, alpaca);
 
     const initialLowesHighest = { lowPrice: 999999, highPrice: 0 };

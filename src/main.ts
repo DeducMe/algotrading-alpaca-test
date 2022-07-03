@@ -2,7 +2,32 @@ import { getTradableAssets } from './queries/getQueries';
 import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
 
 (function () {
-  const initialTickers = ['BTCUSD', 'DOGEUSD', 'USDTUSD', 'ETHUSD'];
+  const initialTickers = [
+    'AAVEUSD',
+    'ALGOUSD',
+    'AVAXUSD',
+    'BATUSD',
+    'BTCUSD',
+    'BCHUSD',
+    'LINKUSD',
+    'DAIUSD',
+    'DOGEUSD',
+    'ETHUSD',
+    'GRTUSD',
+    'LTCUSD',
+    'MKRUSD',
+    'MATICUSD',
+    'NEARUSD',
+    'PAXGUSD',
+    'SHIBUSD',
+    'SOLUSD',
+    'SUSHIUSD',
+    'USDTUSD',
+    'TRXUSD',
+    'UNIUSD',
+    'WBTCUSD',
+    'YFIUSD',
+  ];
 
   function testWebsockets(alpaca: any) {
     /**
@@ -65,7 +90,7 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
     }
 
     function onCreate() {
-      getTradableAssets(alpaca, undefined, 26).then((data:any) => {
+      getTradableAssets(alpaca, undefined, 30 - initialTickers.length).then((data:any) => {
         const newTickers = initialTickers.concat(data);
 
         const stream = new DataStream({ tickers: newTickers });
