@@ -15,6 +15,7 @@ export const setTrade = async (
   tradeWay: string,
   price: number,
   alpaca: any,
+  allowMargin = true,
 ) => {
   try {
     const { getPositions } = require('../queries/getQueries');
@@ -23,6 +24,7 @@ export const setTrade = async (
 
     const positions = await getPositions(alpaca, () => {});
     const openedPosition = positions.find((item:any) => item.symbol === ticker);
+    if (!allowMargin && !openedPosition) return console.log('no position');
     const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
 
     console.log({
@@ -91,14 +93,14 @@ export async function getHighestLowest(ticker: string, alpaca: any) {
   };
 }
 export async function getHighestLowestCrypto(ticker: string, alpaca: any) {
-  const date1HourAgo = timeNow(1.7);
+  const date1HourAgo = timeNow(70);
   const dateNowTime = timeNow();
   const resp = alpaca.getCryptoBars(
     ticker,
     {
       start: date1HourAgo,
       end: dateNowTime,
-      timeframe: '5Min',
+      timeframe: '15Min',
     },
     alpaca.configuration,
   );

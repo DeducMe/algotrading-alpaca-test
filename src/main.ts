@@ -6,12 +6,6 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
   ];
 
   function testWebsockets(alpaca: any) {
-    /**
-     * This example shows how to use the Alpaca Data V2 websocket to subscribe to events.
-     * The socket is available under the `data_steam_v2` property on an Alpaca instance.
-     * There are separate functions for subscribing (and unsubscribing) to trades, quotes and bars as seen below.
-     */
-
     class DataStream {
       subscriptions: {
         trades: any[];

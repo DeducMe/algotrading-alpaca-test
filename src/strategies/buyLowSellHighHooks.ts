@@ -63,7 +63,7 @@ class TradingClass {
 
     const calculateLastLowestHighest = (ticker:string) => {
       // я такого никогда в жизни не видел
-      // оказывается в жс можно передать в редусер константу и она будет изменяться
+      // оказывается в жс можно передать в редус константу и она будет изменяться
       const copyInitialLowesHighest = JSON.parse(JSON.stringify(initialLowesHighest));
       if (!this.bars[ticker].length) return copyInitialLowesHighest;
       return this.bars[ticker].reduce((acc:LowestHighest, item:TradeBar) => {
@@ -94,9 +94,7 @@ class TradingClass {
       }
 
       tickers.forEach((ticker:string) => {
-        this.bars[ticker].length = 20;
-        this.bars[ticker] = this.bars[ticker].filter((item:any) => !!item);
-
+        this.bars[ticker] = this.bars[ticker].splice(this.bars[ticker].length - 20);
         this.lowestHighest[ticker] = calculateLastLowestHighest(ticker);
       });
 
@@ -148,7 +146,7 @@ class TradingClass {
       if (this.awaitForNextBuyBar[ticker]) return;
       if (this.lowestHighest[ticker].lowPrice > lastTrade) {
         this.awaitForNextBuyBar[ticker] = true;
-        setTrade(trade.Symbol, 'buy', lastTrade, alpaca);
+        setTrade(trade.Symbol, 'buy', lastTrade, alpaca, false);
 
         console.log(
           this.lowestHighest[ticker],
@@ -163,7 +161,7 @@ class TradingClass {
       if (this.lowestHighest[ticker].highPrice < lastTrade) {
         this.awaitForNextSellBar[ticker] = true;
 
-        setTrade(trade.Symbol, 'sell', lastTrade, alpaca);
+        setTrade(trade.Symbol, 'sell', lastTrade, alpaca, false);
 
         console.log(
           this.lowestHighest[ticker],
