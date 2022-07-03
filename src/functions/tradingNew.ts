@@ -27,10 +27,10 @@ export const setTrade = async (
 
     await alpaca.createOrder({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : Math.round((account.buying_power * 0.1) / price),
+      qty: closePosition ? openedPosition.qty : (account.cash * 0.1) / price,
       side: tradeWay,
       type: 'market',
-      time_in_force: 'day',
+      time_in_force: 'gtc',
     });
   } catch (e) {
     console.log(e, 'cant create order');

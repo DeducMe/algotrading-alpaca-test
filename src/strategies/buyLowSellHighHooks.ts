@@ -36,6 +36,8 @@ class TradingClass {
   readyToTrade:boolean;
 
   constructor({ alpaca, socket, tickers } :any) {
+    // setTrade('BTCUSD', 'buy', 19225, alpaca);
+
     const initialLowesHighest = { lowPrice: 999999, highPrice: 0 };
 
     this.readyToTrade = false;
@@ -58,13 +60,19 @@ class TradingClass {
       return acc;
     }, {});
 
-    const calculateLastLowestHighest = (ticker:string) => this.bars[ticker]
-      .reduce((acc:LowestHighest, item:TradeBar) => {
+    const calculateLastLowestHighest = (ticker:string) => {
+      // я такого никогда в жизни не видел
+      // оказывается в жс можно передать в редусер константу и она будет изменяться
+      const copyInitialLowesHighest = JSON.parse(JSON.stringify(initialLowesHighest));
+      if (!this.bars[ticker].length) return copyInitialLowesHighest;
+      return this.bars[ticker].reduce((acc:LowestHighest, item:TradeBar) => {
         if (!item.highPrice || !item.lowPrice) return acc;
+
         if (acc.highPrice < item.highPrice) { acc.highPrice = item.highPrice; }
         if (acc.lowPrice > item.lowPrice) { acc.lowPrice = item.lowPrice; }
         return acc;
-      }, initialLowesHighest);
+      }, copyInitialLowesHighest);
+    };
 
     const onCreate = async () => {
       const promiseArr = tickers.map((item:string) => getHighestLowestCrypto(item, alpaca));
@@ -88,7 +96,7 @@ class TradingClass {
         this.bars[ticker].length = 20;
         this.bars[ticker] = this.bars[ticker].filter((item:any) => !!item);
 
-        calculateLastLowestHighest(ticker);
+        this.lowestHighest[ticker] = calculateLastLowestHighest(ticker);
       });
 
       this.readyToTrade = true;
@@ -97,16 +105,24 @@ class TradingClass {
 
     const calculateBars = (trade:TradeType) => {
       const ticker = trade.Symbol;
-      let currentBar = this.bars[trade.Symbol][this.bars[trade.Symbol].length - 1];
+      if (!this.bars[ticker].length) {
+        this.bars[ticker].push({
+          highPrice: 0,
+          lowPrice: 99999999999999,
+          currentPrice: trade.Price,
+        });
+      }
 
+      let currentBar = this.bars[ticker][this.bars[ticker].length - 1];
       if (!currentBar.startTimestamp) currentBar.startTimestamp = trade.Timestamp;
-      if (currentBar.startTimestamp <= moment(trade.Timestamp).subtract(5, 'm').toDate()) {
+      if (moment(currentBar.startTimestamp).toDate() <= moment(trade.Timestamp).subtract(5, 'm').toDate()) {
         this.bars[ticker].shift();
         this.bars[ticker].push(currentBar);
         this.awaitForNextBuyBar[ticker] = false;
         this.awaitForNextSellBar[ticker] = false;
-        calculateLastLowestHighest(ticker);
-        currentBar = this.bars[trade.Symbol][this.bars[trade.Symbol].length - 1];
+        this.lowestHighest[ticker] = calculateLastLowestHighest(ticker);
+        this.bars[ticker][this.bars[ticker].length - 1].startTimestamp = trade.Timestamp;
+        currentBar = this.bars[ticker][this.bars[ticker].length - 1];
       }
 
       const currentHighestLowest = compareHighestLowestToCurrent(
@@ -124,13 +140,11 @@ class TradingClass {
     socket.onCryptoTrade((trade: TradeType) => {
       if (!this.readyToTrade) return;
 
-      // console.log(trade.Symbol, trade.Price);
       calculateBars(trade);
       const lastTrade = trade.Price;
       const ticker = trade.Symbol;
 
       if (this.awaitForNextBuyBar[ticker]) return;
-
       if (this.lowestHighest[ticker].lowPrice > lastTrade) {
         this.awaitForNextBuyBar[ticker] = true;
         setTrade(trade.Symbol, 'buy', lastTrade, alpaca);
@@ -146,7 +160,7 @@ class TradingClass {
       if (this.awaitForNextSellBar[ticker]) return;
 
       if (this.lowestHighest[ticker].highPrice < lastTrade) {
-        this.awaitForNextBuyBar[ticker] = false;
+        this.awaitForNextSellBar[ticker] = true;
 
         setTrade(trade.Symbol, 'sell', lastTrade, alpaca);
 
