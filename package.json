@@ -7,6 +7,7 @@
     "@alpacahq/alpaca-trade-api": "^2.12.1",
     "axios": "^0.26.0",
     "express": "^4.17.2",
+    "moment": "^2.29.3",
     "node-fetch": "^3.2.0",
     "url": "^0.11.0"
   },

@@ -1,4 +1,9 @@
+import { getTradableAssets } from './queries/getQueries';
+import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
+
 (function () {
+  const initialTickers = ['BTCUSD', 'DOGEUSD', 'USDTUSD', 'ETHUSD'];
+
   function testWebsockets(alpaca: any) {
     /**
      * This example shows how to use the Alpaca Data V2 websocket to subscribe to events.
@@ -18,41 +23,32 @@
         corrections: any[];
       };
 
-      constructor() {
-        const socket = alpaca.data_stream_v2;
+      socket: any;
+
+      constructor({ tickers }:{ tickers:string[] }) {
+        const socket = alpaca.crypto_stream_v2;
+        this.socket = socket;
+        // console.log(alpaca);
 
         this.subscriptions = socket.session.subscriptions;
 
         socket.onConnect(() => {
           console.log('Connected!');
-          socket.subscribeForQuotes(['AAPL']);
-          socket.subscribeForTrades(['FB']);
-          socket.subscribeForBars(['SPY']);
-          socket.subscribeForStatuses(['*']);
+          // socket.subscribeForQuotes(tickers);
+          socket.subscribeForTrades(tickers);
+          // socket.subscribeForBars(tickers);
         });
 
         socket.onError((err: any) => {
           console.log(err);
         });
 
-        socket.onStockTrade((trade: any) => {
-          console.log(trade);
-        });
-
-        socket.onStockQuote((quote: any) => {
-          console.log(quote);
-        });
-
-        socket.onStockBar((bar: any) => {
-          console.log(bar);
-        });
-
-        socket.onStatuses((s: any) => {
-          console.log(s);
+        socket.onCryptoTrade((trade: any) => {
+          // console.log(trade);
         });
 
         socket.onStateChange((state: any) => {
-          console.log(state);
+          console.log(state, 'state');
         });
 
         socket.onDisconnect(() => {
@@ -62,16 +58,23 @@
         socket.connect();
 
         // unsubscribe from FB after a second
-        setTimeout(() => {
-          socket.unsubscribeFromTrades(['FB']);
-          console.log('unsubcribed');
+        setInterval(() => {
+          // console.log(this.subscriptions);
         }, 1000);
       }
     }
 
-    const stream = new DataStream();
+    function onCreate() {
+      getTradableAssets(alpaca, undefined, 26).then((data:any) => {
+        const newTickers = initialTickers.concat(data);
 
-    console.log(stream.subscriptions);
+        const stream = new DataStream({ tickers: newTickers });
+
+        buyLowSellHighWebhook(alpaca, stream.socket, newTickers);
+      });
+    }
+
+    onCreate();
   }
 
   function main(stocks: string[], disableTraiding: boolean) {

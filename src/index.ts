@@ -69,6 +69,6 @@ import { getPortfolioHistory } from './queries/getQueries';
   });
 
   const stocks = ['AAPL', 'MSFT', 'TSLA', 'AMD', 'BABA', 'TAL', 'COIN'];
-  main(stocks, false);
+  // main(stocks, false);
   testWebsockets(alpaca);
 }());

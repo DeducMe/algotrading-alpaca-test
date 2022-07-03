@@ -1,6 +1,26 @@
 import { CBType, CBTypeFunction } from '../types/receiver';
 import { candleStamp } from '../types/tradeTypes';
 
+export function getTradableAssets(alpaca: any, cb?: CBTypeFunction, length?:number) {
+  return alpaca.getAssets({ status: 'active', class: 'crypto' }).then((data: any) => {
+    const filteredData = (data.filter((item:any) => (
+      item.tradable
+      && item.marginable
+      && item.shortable
+      && item.easy_to_borrow
+      && item.fractionable
+    )));
+
+    filteredData.length = length;
+
+    const dataSymbols = filteredData.map((item:any) => item.symbol);
+
+    if (cb) cb({ err: null, data: dataSymbols });
+
+    return dataSymbols;
+  });
+}
+
 export function getPositions(alpaca: any, cb: CBTypeFunction) {
   return alpaca.getPositions().then((data: any) => {
     const cbData = data.map((item: any) => {
