@@ -27,7 +27,7 @@ export const setTrade = async (
 
     console.log({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : (Math.round((account.cash * 0.05) / price) || 0.001),
+      qty: closePosition ? openedPosition.qty : (((account.cash * 0.05) / price).toFixed(1) || 0.1),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
@@ -35,7 +35,7 @@ export const setTrade = async (
 
     await alpaca.createOrder({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : (account.cash * 0.1) / price,
+      qty: closePosition ? openedPosition.qty : (((account.cash * 0.05) / price).toFixed(1) || 0.1),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',

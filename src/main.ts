@@ -2,31 +2,7 @@ import { getTradableAssets } from './queries/getQueries';
 import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
 
 (function () {
-  const initialTickers = [
-    'AAVEUSD',
-    'ALGOUSD',
-    'AVAXUSD',
-    'BATUSD',
-    'BTCUSD',
-    'BCHUSD',
-    'LINKUSD',
-    'DAIUSD',
-    'DOGEUSD',
-    'ETHUSD',
-    'GRTUSD',
-    'LTCUSD',
-    'MKRUSD',
-    'MATICUSD',
-    'NEARUSD',
-    'PAXGUSD',
-    'SHIBUSD',
-    'SOLUSD',
-    'SUSHIUSD',
-    'USDTUSD',
-    'TRXUSD',
-    'UNIUSD',
-    'WBTCUSD',
-    'YFIUSD',
+  const initialTickers = <string[]>[
   ];
 
   function testWebsockets(alpaca: any) {
