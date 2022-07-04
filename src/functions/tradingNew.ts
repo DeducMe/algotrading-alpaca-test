@@ -16,20 +16,23 @@ export const setTrade = async (
   price: number,
   alpaca: any,
   allowMargin = true,
+  crypto = false,
 ) => {
   try {
     const { getPositions } = require('../queries/getQueries');
 
     const account = await alpaca.getAccount();
-
     const positions = await getPositions(alpaca, () => {});
+
     const openedPosition = positions.find((item:any) => item.symbol === ticker);
     if (!allowMargin && !openedPosition) return console.log('no position');
     const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
 
     console.log({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : (((account.cash * 0.05) / price).toFixed(1) || 0.1),
+      qty: closePosition
+        ? openedPosition.qty
+        : (((account.cash * 0.1) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
@@ -37,7 +40,9 @@ export const setTrade = async (
 
     await alpaca.createOrder({
       symbol: ticker,
-      qty: closePosition ? openedPosition.qty : (((account.cash * 0.05) / price).toFixed(1) || 0.1),
+      qty: closePosition
+        ? openedPosition.qty
+        : (((account.cash * 0.1) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
@@ -72,23 +77,28 @@ export async function getHighestLowest(ticker: string, alpaca: any) {
     alpaca.configuration,
   );
 
-  let lowest = 9999999999;
-  let highest = 0;
-  const responses = [];
+  let responses: any[] = [];
+  try {
+    for await (const bar of resp) {
+      console.log(bar);
+      const responseIndex = responses.findIndex(item => item.Timestamp === bar.Timestamp);
+      const response = responses[responseIndex];
+      if (response) {
+        if (response.LowPrice < bar.LowPrice) {
+          bar.LowPrice = response.LowPrice;
+        }
+        if (response.HighPrice > bar.HighPrice) {
+          bar.HighPrice = response.HighPrice;
+        }
 
-  for await (const bar of resp) {
-    responses.push(bar);
-    if (bar.LowPrice < lowest) {
-      lowest = bar.LowPrice;
+        responses[responseIndex] = bar;
+      } else { responses.push(bar); }
     }
-    if (bar.HighPrice > highest) {
-      highest = bar.HighPrice;
-    }
-  }
+  } catch {}
+
+  responses = responses.map(item => ({ High: item.HighPrice, Low: item.LowPrice, Timestamp: item.Timestamp }));
 
   return {
-    lowest,
-    highest,
     responses,
   };
 }

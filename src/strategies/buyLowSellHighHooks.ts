@@ -35,7 +35,9 @@ class TradingClass {
 
   readyToTrade:boolean;
 
-  constructor({ alpaca, socket, tickers } :any) {
+  constructor({
+    alpaca, socket, tickers, stockTrading,
+  } :any) {
     console.log(tickers);
     // setTrade('BTCUSD', 'buy', 19225, alpaca);
 
@@ -65,6 +67,7 @@ class TradingClass {
       // я такого никогда в жизни не видел
       // оказывается в жс можно передать в редус константу и она будет изменяться
       const copyInitialLowesHighest = JSON.parse(JSON.stringify(initialLowesHighest));
+
       if (!this.bars[ticker].length) return copyInitialLowesHighest;
       return this.bars[ticker].reduce((acc:LowestHighest, item:TradeBar) => {
         if (!item.highPrice || !item.lowPrice) return acc;
@@ -76,7 +79,12 @@ class TradingClass {
     };
 
     const onCreate = async () => {
-      const promiseArr = tickers.map((item:string) => getHighestLowestCrypto(item, alpaca));
+      const promiseArr = tickers.map((item:string) => (
+        stockTrading
+          ? getHighestLowest(item, alpaca)
+          : getHighestLowestCrypto(item, alpaca)
+      ));
+
       for await (const bar of promiseArr) {
         const {
           responses,
@@ -136,7 +144,8 @@ class TradingClass {
       this.bars[trade.Symbol][this.bars[trade.Symbol].length - 1].lowPrice = currentHighestLowest.lowPrice;
     };
 
-    socket.onCryptoTrade((trade: TradeType) => {
+    const onTrade = (trade:TradeType) => {
+      console.log(trade);
       if (!this.readyToTrade) return;
 
       calculateBars(trade);
@@ -146,7 +155,7 @@ class TradingClass {
       if (this.awaitForNextBuyBar[ticker]) return;
       if (this.lowestHighest[ticker].lowPrice > lastTrade) {
         this.awaitForNextBuyBar[ticker] = true;
-        setTrade(trade.Symbol, 'buy', lastTrade, alpaca, false);
+        setTrade(trade.Symbol, 'buy', lastTrade, alpaca, stockTrading, !stockTrading);
 
         console.log(
           this.lowestHighest[ticker],
@@ -161,7 +170,7 @@ class TradingClass {
       if (this.lowestHighest[ticker].highPrice < lastTrade) {
         this.awaitForNextSellBar[ticker] = true;
 
-        setTrade(trade.Symbol, 'sell', lastTrade, alpaca, false);
+        setTrade(trade.Symbol, 'sell', lastTrade, alpaca, stockTrading, !stockTrading);
 
         console.log(
           this.lowestHighest[ticker],
@@ -170,10 +179,22 @@ class TradingClass {
           lastTrade,
         );
       }
-    });
+    };
+
+    if (stockTrading) {
+      socket.onStockTrade((trade: TradeType) => {
+        onTrade(trade);
+      });
+    } else {
+      socket.onCryptoTrade((trade: TradeType) => {
+        onTrade(trade);
+      });
+    }
   }
 }
 
-export function buyLowSellHighWebhook(alpaca:any, socket:any, tickers:string[]) {
-  const tradingClass = new TradingClass({ alpaca, socket, tickers });
+export function buyLowSellHighWebhook(alpaca:any, socket:any, tickers:string[], stockTrading:boolean) {
+  const tradingClass = new TradingClass({
+    alpaca, socket, tickers, stockTrading,
+  });
 }

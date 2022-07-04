@@ -2,8 +2,8 @@ import { getTradableAssets } from './queries/getQueries';
 import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
 
 (function () {
-  const initialTickers = <string[]>[
-  ];
+  const initialTickers = <string[]>['BTCUSD'];
+  const initialStockTickers = <string[]>['AAPL', 'MSFT', 'TSLA', 'AMD', 'BABA', 'TAL', 'COIN'];
 
   function testWebsockets(alpaca: any) {
     class DataStream {
@@ -20,53 +20,66 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
 
       socket: any;
 
-      constructor({ tickers }:{ tickers:string[] }) {
+      stockSocket:any;
+
+      constructor({ cryptoTickers, stockTickers }:{ cryptoTickers:string[]; stockTickers:string[] }) {
         const socket = alpaca.crypto_stream_v2;
+        const stockSocket = alpaca.data_stream_v2;
+
         this.socket = socket;
+        this.stockSocket = stockSocket;
+
         // console.log(alpaca);
 
         this.subscriptions = socket.session.subscriptions;
 
         socket.onConnect(() => {
-          console.log('Connected!');
-          // socket.subscribeForQuotes(tickers);
-          socket.subscribeForTrades(tickers);
-          // socket.subscribeForBars(tickers);
+          console.log('Connected crypto!');
+          socket.subscribeForTrades(cryptoTickers);
+        });
+
+        stockSocket.onConnect(() => {
+          console.log('Connected stocks!');
+          stockSocket.subscribeForTrades(stockTickers);
         });
 
         socket.onError((err: any) => {
-          console.log(err);
+          console.log(err, 'err crypto');
         });
-
-        socket.onCryptoTrade((trade: any) => {
-          // console.log(trade);
+        stockSocket.onError((err: any) => {
+          console.log(err, 'err stock');
         });
 
         socket.onStateChange((state: any) => {
-          console.log(state, 'state');
+          console.log(state, 'state crypto');
+        });
+        stockSocket.onStateChange((state: any) => {
+          console.log(state, 'state stock');
         });
 
         socket.onDisconnect(() => {
-          console.log('Disconnected');
+          console.log('Disconnected crypto');
+        });
+        stockSocket.onDisconnect(() => {
+          console.log('Disconnected stock');
         });
 
         socket.connect();
-
-        // unsubscribe from FB after a second
-        setInterval(() => {
-          // console.log(this.subscriptions);
-        }, 1000);
+        stockSocket.connect();
       }
     }
 
-    function onCreate() {
-      getTradableAssets(alpaca, undefined, 30 - initialTickers.length).then((data:any) => {
-        const newTickers = initialTickers.concat(data);
+    async function onCreate() {
+      const stockTickers = await getTradableAssets(alpaca, undefined, 15 - initialStockTickers.length);
+      const newStockTickers = initialStockTickers.concat(stockTickers);
 
-        const stream = new DataStream({ tickers: newTickers });
+      const tickers = await getTradableAssets(alpaca, undefined, 15 - initialTickers.length);
+      const newTickers = initialStockTickers.concat(tickers);
 
-        buyLowSellHighWebhook(alpaca, stream.socket, newTickers);
-      });
+      const stream = new DataStream({ cryptoTickers: newTickers, stockTickers: newStockTickers });
+
+      buyLowSellHighWebhook(alpaca, stream.stockSocket, newStockTickers, true);
+      buyLowSellHighWebhook(alpaca, stream.socket, newTickers, false);
     }
 
     onCreate();
