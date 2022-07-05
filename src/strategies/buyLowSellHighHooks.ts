@@ -165,6 +165,7 @@ class TradingClass {
       if (this.awaitForNextBuyBar[ticker]) return;
       if (this.lowestHighest[ticker].lowPrice > lastTrade) {
         this.awaitForNextBuyBar[ticker] = true;
+        if (this.lowestHighest[ticker].lowPrice === 999999 || this.lowestHighest[ticker].highPrice === 0) return;
         setTrade(
           trade.Symbol,
           'buy',
@@ -186,6 +187,7 @@ class TradingClass {
 
       if (this.lowestHighest[ticker].highPrice < lastTrade) {
         this.awaitForNextSellBar[ticker] = true;
+        if (this.lowestHighest[ticker].lowPrice === 999999 || this.lowestHighest[ticker].highPrice === 0) return;
 
         setTrade(
           trade.Symbol,

@@ -1,4 +1,4 @@
-const keyId = "PKXSGQUPSN3258DBHRRA";
-const secretKey = "8D4iCgWcRXRWdv6aCuIcTDYaYLCUNX4E6g7mc93Z";
+const keyId = 'PKFJIFLZGM5ZCAAC1EWW';
+const secretKey = 'vmqUvjMjgyk8wsvmnBV9HUWgNfB5MpksQHZSbDsh';
 
 module.exports = { keyId, secretKey };

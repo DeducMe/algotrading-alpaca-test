@@ -1,20 +1,28 @@
 import { CBType, CBTypeFunction } from '../types/receiver';
 import { candleStamp } from '../types/tradeTypes';
 
-export function getTradableAssets(alpaca: any, cb?: CBTypeFunction, length?:number, crypto?:boolean) {
+export function getTradableAssets(
+  alpaca: any,
+  cb?: CBTypeFunction,
+  length?: number,
+  crypto?: boolean,
+) {
   return alpaca.getAssets({ status: 'active' }).then((data: any) => {
-    let filteredData = (data.filter((item:any) => (
-      (crypto ? item.class === 'crypto' : item.class !== 'crypto')
-      && item.tradable
-      && item.min_trade_increment < 1
-    )));
+    let filteredData = data.filter(
+      (item: any) => (crypto ? item.class === 'crypto' : item.class !== 'crypto')
+        && (crypto ? true : item.marginable)
+        && (crypto ? true : item.shortable)
+        && (crypto ? true : item.easy_to_borrow)
+        && item.tradable
+        && item.min_trade_increment < 1,
+    );
 
-    console.log(filteredData);
+    console.log(!crypto && filteredData.length);
 
     filteredData.length = length;
-    filteredData = filteredData.filter((item:any) => !!item);
+    filteredData = filteredData.filter((item: any) => !!item);
 
-    const dataSymbols = filteredData.map((item:any) => item.symbol);
+    const dataSymbols = filteredData.map((item: any) => item.symbol);
 
     if (cb) cb({ err: null, data: dataSymbols });
 

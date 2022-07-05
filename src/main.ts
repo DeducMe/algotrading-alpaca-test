@@ -85,9 +85,8 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
       const newTickers = initialStockTickers.concat(tickers);
 
       const stream = new DataStream({ cryptoTickers: newTickers, stockTickers: newStockTickers });
-
-      buyLowSellHighWebhook(alpaca, stream.stockSocket, newStockTickers, true);
-      buyLowSellHighWebhook(alpaca, stream.socket, newTickers, false);
+      if (stockTickers.length) buyLowSellHighWebhook(alpaca, stream.stockSocket, newStockTickers, true);
+      if (tickers.length) buyLowSellHighWebhook(alpaca, stream.socket, newTickers, false);
     }
 
     onCreate();
