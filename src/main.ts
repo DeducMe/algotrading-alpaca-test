@@ -59,9 +59,17 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
 
         socket.onDisconnect(() => {
           console.log('Disconnected crypto');
+          // socket.disconnect();
+          setTimeout(() => {
+            socket.connect();
+          }, 10000);
         });
         stockSocket.onDisconnect(() => {
           console.log('Disconnected stock');
+          // stockSocket.disconnect();
+          setTimeout(() => {
+            stockSocket.connect();
+          }, 10000);
         });
 
         socket.connect();
@@ -70,10 +78,10 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
     }
 
     async function onCreate() {
-      const stockTickers = await getTradableAssets(alpaca, undefined, 15 - initialStockTickers.length);
+      const stockTickers = await getTradableAssets(alpaca, undefined, 15 - initialStockTickers.length, false);
       const newStockTickers = initialStockTickers.concat(stockTickers);
 
-      const tickers = await getTradableAssets(alpaca, undefined, 15 - initialTickers.length);
+      const tickers = await getTradableAssets(alpaca, undefined, 15 - initialTickers.length, true);
       const newTickers = initialStockTickers.concat(tickers);
 
       const stream = new DataStream({ cryptoTickers: newTickers, stockTickers: newStockTickers });

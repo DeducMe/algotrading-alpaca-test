@@ -25,7 +25,7 @@ export const setTrade = async (
     const positions = await getPositions(alpaca, () => {});
 
     const openedPosition = positions.find((item:any) => item.symbol === ticker);
-    if (!allowMargin && !openedPosition) return console.log('no position');
+    if (!allowMargin && !openedPosition && tradeWay === 'sell') return console.log('no position');
     const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
 
     console.log({

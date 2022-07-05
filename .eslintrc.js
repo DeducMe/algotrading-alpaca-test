@@ -23,7 +23,7 @@ module.exports = {
 
     "react/require-default-props": ["off"],
 
-    "func-names":["off"],
+    "func-names": ["off"],
 
     "import/prefer-default-export": ["off"],
     "react/jsx-filename-extension": "off",
