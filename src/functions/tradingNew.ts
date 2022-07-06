@@ -18,37 +18,35 @@ export const setTrade = async (
   allowMargin = true,
   crypto = false,
 ) => {
+  const { getPositions } = require('../queries/getQueries');
+
+  const account = await alpaca.getAccount();
+  const positions = await getPositions(alpaca, () => {});
+
+  const openedPosition = positions.find((item:any) => item.symbol === ticker);
+  if (!allowMargin && !openedPosition && tradeWay === 'sell') return console.log('no position');
+  const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
+  const qty = closePosition
+    ? openedPosition.qty
+    : (((account.equity * 0.05) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.01 : 0));
   try {
-    const { getPositions } = require('../queries/getQueries');
-
-    const account = await alpaca.getAccount();
-    const positions = await getPositions(alpaca, () => {});
-
-    const openedPosition = positions.find((item:any) => item.symbol === ticker);
-    if (!allowMargin && !openedPosition && tradeWay === 'sell') return console.log('no position');
-    const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
-
-    console.log({
-      symbol: ticker,
-      qty: closePosition
-        ? openedPosition.qty
-        : (((account.equity * 0.05) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
-      side: tradeWay,
-      type: 'market',
-      time_in_force: 'gtc',
-    });
-
     await alpaca.createOrder({
       symbol: ticker,
-      qty: closePosition
-        ? openedPosition.qty
-        : (((account.cash * 0.1) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
+      qty,
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
     });
   } catch (e) {
-    console.log(e, 'cant create order');
+    console.log(e, 'cant create order',
+      {
+        symbol: ticker,
+        qty,
+        side: tradeWay,
+        type: 'market',
+        time_in_force: 'gtc',
+      });
+    if (qty === 0) console.log('qty - 0');
   }
 };
 
