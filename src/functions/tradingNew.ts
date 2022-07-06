@@ -32,7 +32,7 @@ export const setTrade = async (
       symbol: ticker,
       qty: closePosition
         ? openedPosition.qty
-        : (((account.cash * 0.1) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
+        : (((account.equity * 0.05) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.1 : 1)),
       side: tradeWay,
       type: 'market',
       time_in_force: 'gtc',
