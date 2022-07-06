@@ -81,8 +81,8 @@ import { buyLowSellHighWebhook } from './strategies/buyLowSellHighHooks';
       const stockTickers = await getTradableAssets(alpaca, undefined, 15 - initialStockTickers.length, false);
       const newStockTickers = initialStockTickers.concat(stockTickers);
 
-      const tickers = await getTradableAssets(alpaca, undefined, 15 - initialTickers.length, true);
-      const newTickers = initialStockTickers.concat(tickers);
+      const tickers = await getTradableAssets(alpaca, undefined, (stockTickers.length ? 15 : 30) - initialTickers.length, true);
+      const newTickers = initialTickers.concat(tickers);
 
       const stream = new DataStream({ cryptoTickers: newTickers, stockTickers: newStockTickers });
       if (stockTickers.length) buyLowSellHighWebhook(alpaca, stream.stockSocket, newStockTickers, true);
