@@ -41,7 +41,7 @@ class TradingClass {
     alpaca, socket, tickers, stockTrading,
   }: any) {
     console.log(tickers);
-    setTrade('BTCUSD', 'buy', 19225, alpaca);
+    // setTrade('BTCUSD', 'buy', 19225, alpaca, false, true);
 
     const initialLowesHighest = { lowPrice: 999999, highPrice: 0 };
 

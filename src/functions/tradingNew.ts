@@ -26,9 +26,12 @@ export const setTrade = async (
   const openedPosition = positions.find((item:any) => item.symbol === ticker);
   if (!allowMargin && !openedPosition && tradeWay === 'sell') return console.log('no position');
   const closePosition = openedPosition ? openedPosition.side !== tradeWay : false;
+  const positionCalculate = ((account.equity * 0.05) / price).toFixed(crypto ? 1 : 0);
+  const position = (Number(positionCalculate) === 0 && crypto) ? 0.01 : positionCalculate;
   const qty = closePosition
     ? openedPosition.qty
-    : (((account.equity * 0.05) / price).toFixed(crypto ? 1 : 0) || (crypto ? 0.01 : 0));
+    : position;
+
   try {
     await alpaca.createOrder({
       symbol: ticker,
