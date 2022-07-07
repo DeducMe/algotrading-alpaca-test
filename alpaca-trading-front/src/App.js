@@ -61,7 +61,6 @@ function App() {
           100 -
         100
       ).toFixed(2);
-      console.log(changeSpyPercent, "sdjojfsdkjlfljksdf");
       setPercentAboveSPY((currentGain.percent - changeSpyPercent).toFixed(2));
     }
   }, [currentGain, SPYHistoryMonth]);
@@ -161,18 +160,14 @@ function App() {
             noPercent
             minTickGap={30}
             data={SPYHistoryMonth?.map((item) => {
-              if (item.equity)
-                return {
-                  percent: (item.equity * 10).toFixed(2),
-                  changePercent: (
-                    (item.equity / SPYHistoryMonth[0].equity) * 100 -
-                    100
-                  ).toFixed(2),
-                  timestamp: new Date(item.timestamp)
-                    .toISOString()
-                    .slice(5, 10),
-                };
-              return false;
+              return {
+                percent: (item.equity * 10).toFixed(2),
+                changePercent: (
+                  (item.equity / SPYHistoryMonth[0].equity) * 100 -
+                  100
+                ).toFixed(2),
+                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
+              };
             })}
           ></Chart>
         </div>
@@ -181,17 +176,12 @@ function App() {
           <Chart
             minTickGap={30}
             data={portfolioHistory?.map((item) => {
-              if (item.equity)
-                return {
-                  percent: Number(
-                    (((item.equity - 10000) / 10000) * 100).toFixed(2)
-                  ),
-                  timestamp: new Date(item.timestamp)
-                    .toISOString()
-                    .slice(5, 10),
-                };
-
-              return false;
+              return {
+                percent: Number(
+                  (((item.equity - 10000) / 10000) * 100).toFixed(2)
+                ),
+                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
+              };
             })}
           ></Chart>
         </div>
@@ -201,17 +191,12 @@ function App() {
           <Chart
             minTickGap={30}
             data={portfolioHistoryWeek?.map((item) => {
-              if (item.equity)
-                return {
-                  percent: Number(
-                    (((item.equity - 10000) / 10000) * 100).toFixed(2)
-                  ),
-                  timestamp: new Date(item.timestamp)
-                    .toISOString()
-                    .slice(5, 10),
-                };
-
-              return false;
+              return {
+                percent: Number(
+                  ((((item.equity - 10000) / 10000) * 100) / 2 + 50).toFixed(2)
+                ),
+                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
+              };
             })}
           ></Chart>
         </div>
