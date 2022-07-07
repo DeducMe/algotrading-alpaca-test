@@ -136,26 +136,3 @@ export function getPortfolioHistory(alpaca: any, cb: CBTypeFunction, req: any) {
       cb({ err: "Bad params (try /api/history/1M/1D/true)", data: result })
     );
 }
-
-export function getPortfolioHistoryDay(alpaca: any, cb: CBTypeFunction) {
-  const result: candleStamp[] = [];
-
-  alpaca
-    .getPortfolioHistory({
-      timeframe: "5Min",
-      period: "1D",
-      extended_hours: true,
-    })
-    .then((item: any) => {
-      item.timestamp.forEach((el: any, index: number) => {
-        const newObj = {
-          timestamp: new Date(el * 1000),
-          equity: item.equity[index],
-          profitLoss: item.profit_loss[index],
-        };
-        result.push(newObj);
-      });
-
-      cb({ err: null, data: result });
-    });
-}
