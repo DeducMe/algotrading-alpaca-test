@@ -128,7 +128,7 @@ function App() {
               if (item.equity)
                 return {
                   percent: Number(
-                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                    (((item.equity - 10000) / 10000) * 100).toFixed(2)
                   ),
                   timestamp: new Date(item.timestamp)
                     .toISOString()
@@ -148,7 +148,7 @@ function App() {
               if (item.equity)
                 return {
                   percent: Number(
-                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                    (((item.equity - 10000) / 10000) * 100).toFixed(2)
                   ),
                   timestamp: new Date(item.timestamp)
                     .toISOString()
@@ -168,7 +168,7 @@ function App() {
               if (item.equity)
                 return {
                   percent: Number(
-                    (((item.equity - 100000) / 100000) * 100).toFixed(2)
+                    (((item.equity - 10000) / 10000) * 100).toFixed(2)
                   ),
                   timestamp: new Date(item.timestamp)
                     .toISOString()
