@@ -12,9 +12,19 @@ import {
 
 import "./chart.css";
 
-export const Chart = ({ data, minTickGap }) => {
+export const Chart = ({ data, minTickGap, noPercent }) => {
   const CustomTooltip = ({ active, payload, label }) => {
+    console.log(payload);
     if (active && payload && payload.length) {
+      if (noPercent)
+        return (
+          <div className="custom-tooltip">
+            <p className={`label`}>{`${payload[0].value}`}</p>
+            <p
+              className={`label ${payload[1].value >= 0 ? "green" : "red"}`}
+            >{`${payload[1].value >= 0 ? "+" : ""}${payload[1].value}%`}</p>
+          </div>
+        );
       return (
         <div className="custom-tooltip">
           <p className={`label ${payload[0].value >= 0 ? "green" : "red"}`}>{`${
@@ -52,6 +62,13 @@ export const Chart = ({ data, minTickGap }) => {
           <Line
             type="monotone"
             dataKey="percent"
+            stroke="#8884d8"
+            dot={false}
+            activeDot={{ r: 5 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="changePercent"
             stroke="#8884d8"
             dot={false}
             activeDot={{ r: 5 }}
