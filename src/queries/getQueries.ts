@@ -62,8 +62,8 @@ export function getAccount(alpaca: any, cb: CBTypeFunction) {
     cb({
       err: null,
       data: {
-        total: (account.portfolio_value - 100000).toFixed(2),
-        percent: (((account.portfolio_value - 100000) / 100000) * 100).toFixed(
+        total: (account.portfolio_value - 10000).toFixed(2),
+        percent: (((account.portfolio_value - 10000) / 10000) * 100).toFixed(
           2,
         ),
       },
