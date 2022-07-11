@@ -146,14 +146,14 @@ function App() {
           <div className="current-gain">
             <p>current gain - {currentGain.total}$</p>
             <p className={currentGain.percent >= 0 ? "green" : "red"}>
-              {currentGain.percent >= 0 && "+" + currentGain.percent}%
+              {(currentGain.percent >= 0 && "+") + currentGain.percent}%
             </p>
           </div>
           {percentAboveSPY && (
             <div className="current-gain">
               <p>above SPY this month - </p>
               <p className={percentAboveSPY >= 0 ? "green" : "red"}>
-                {(percentAboveSPY >= 0 ? "+" : "-") + percentAboveSPY}%
+                {(percentAboveSPY >= 0 && "+") + percentAboveSPY}%
               </p>
             </div>
           )}
@@ -161,7 +161,7 @@ function App() {
             <div className="current-gain">
               <p>above SPY this year - </p>
               <p className={percentAboveSPYYear >= 0 ? "green" : "red"}>
-                {(percentAboveSPYYear >= 0 ? "+" : "-") + percentAboveSPYYear}%
+                {(percentAboveSPYYear >= 0 && "+") + percentAboveSPYYear}%
               </p>
             </div>
           )}
