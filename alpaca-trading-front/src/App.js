@@ -14,8 +14,12 @@ function App() {
   const [portfolioHistory, setPortfolioHistory] = useState();
   const [portfolioHistoryToday, setPortfolioHistoryToday] = useState();
   const [portfolioHistoryWeek, setPortfolioHistoryWeek] = useState();
+  const [portfolioHistoryAll, setPortfolioHistoryAll] = useState();
   const [SPYHistoryMonth, setSPYHistoryMonth] = useState();
+  const [SPYHistoryYear, setSPYHistoryYear] = useState();
+
   const [percentAboveSPY, setPercentAboveSPY] = useState();
+  const [percentAboveSPYYear, setPercentAboveSPYYear] = useState();
 
   const [currentGain, setCurrentGain] = useState();
   const [currentPositions, setCurrentPositions] = useState();
@@ -61,11 +65,27 @@ function App() {
           100 -
         100
       ).toFixed(2);
+
+      const changeSpyPercentYear = (
+        (SPYHistoryYear[SPYHistoryYear.length - 1].equity /
+          SPYHistoryYear[0].equity) *
+          100 -
+        100
+      ).toFixed(2);
+
+      setPercentAboveSPYYear(
+        (currentGain.percent - changeSpyPercentYear).toFixed(2)
+      );
+
       setPercentAboveSPY((currentGain.percent - changeSpyPercent).toFixed(2));
     }
   }, [currentGain, SPYHistoryMonth]);
 
   useEffect(() => {
+    fetch(`${url}api/history/all/1D/true`)
+      .then((res) => res.json())
+      .then((res) => setPortfolioHistoryAll(res));
+
     fetch(`${url}api/history/1M/1D/true`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistory(res));
@@ -73,13 +93,14 @@ function App() {
     fetch(`${url}api/history/1D/5Min/true`)
       .then((res) => res.json())
       .then((res) => setPortfolioHistoryToday(res));
-    const weekDate = new Date();
-    weekDate.setDate(new Date().getDate() - 7);
-    const weekDateStringified = weekDate.toISOString().slice(0, 10);
-    // 1656588725766
-    fetch(`${url}api/history/${weekDateStringified}/15Min/false`)
-      .then((res) => res.json())
-      .then((res) => setPortfolioHistoryWeek(res));
+
+    // const weekDate = new Date();
+    // weekDate.setDate(new Date().getDate() - 7);
+    // const weekDateStringified = weekDate.toISOString().slice(0, 10);
+
+    // fetch(`${url}api/history/${weekDateStringified}/15Min/false`)
+    //   .then((res) => res.json())
+    //   .then((res) => setPortfolioHistoryWeek(res));
 
     const now = new Date();
     now.setDate(new Date().getDate() - 1);
@@ -89,9 +110,17 @@ function App() {
     monthDate.setDate(new Date().getDate() - 30);
     const monthDateStringified = monthDate.toISOString().slice(0, 10);
 
+    const yearDate = new Date();
+    yearDate.setDate(new Date().getDate() - 30);
+    const yearDateStringified = yearDate.toISOString().slice(0, 10);
+
     fetch(`${url}api/tickers/SPY/${monthDateStringified}/${nowStringified}/1H`)
       .then((res) => res.json())
       .then((res) => setSPYHistoryMonth(res));
+
+    fetch(`${url}api/tickers/SPY/${yearDateStringified}/${nowStringified}/1D`)
+      .then((res) => res.json())
+      .then((res) => setSPYHistoryYear(res));
 
     fetch(`${url}api/current`)
       .then((res) => res.json())
@@ -108,13 +137,6 @@ function App() {
       });
   }, []);
 
-  useEffect(() => {
-    console.log(
-      "В недельном графике неверные данные, т.к. альпака не возвращает последние 15 мину каждого дня"
-    );
-    console.log(portfolioHistoryWeek);
-  }, [portfolioHistoryWeek]);
-
   return (
     <div className="App">
       {currentGain && (
@@ -129,9 +151,17 @@ function App() {
           </div>
           {percentAboveSPY && (
             <div className="current-gain">
-              <p>above SPY - </p>
+              <p>above SPY this month - </p>
               <p className={percentAboveSPY >= 0 ? "green" : "red"}>
-                {percentAboveSPY >= 0 && "+" + percentAboveSPY}%
+                {(percentAboveSPY >= 0 ? "+" : "-") + percentAboveSPY}%
+              </p>
+            </div>
+          )}
+          {percentAboveSPYYear && (
+            <div className="current-gain">
+              <p>above SPY this year - </p>
+              <p className={percentAboveSPYYear >= 0 ? "green" : "red"}>
+                {(percentAboveSPYYear >= 0 ? "+" : "-") + percentAboveSPYYear}%
               </p>
             </div>
           )}
@@ -154,6 +184,37 @@ function App() {
         </div>
       )}
       <div className="flex chart-container">
+        <div className="chart-block">
+          <h3 className="text-align-center">SPY year</h3>
+          <Chart
+            noPercent
+            minTickGap={30}
+            data={SPYHistoryYear?.map((item) => {
+              return {
+                percent: (item.equity * 10).toFixed(2),
+                changePercent: (
+                  (item.equity / SPYHistoryYear[0].equity) * 100 -
+                  100
+                ).toFixed(2),
+                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
+              };
+            })}
+          ></Chart>
+        </div>
+        <div className="chart-block">
+          <h3 className="text-align-center">all</h3>
+          <Chart
+            minTickGap={30}
+            data={portfolioHistoryAll?.map((item) => {
+              return {
+                percent: Number(
+                  (((item.equity - 10000) / 10000) * 100).toFixed(2)
+                ),
+                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
+              };
+            })}
+          ></Chart>
+        </div>
         <div className="chart-block">
           <h3 className="text-align-center">SPY month</h3>
           <Chart
@@ -185,21 +246,27 @@ function App() {
             })}
           ></Chart>
         </div>
-        <div className="chart-block">
-          <h3 className="text-align-center">week</h3>
+        {portfolioHistoryWeek && (
+          <div className="chart-block">
+            <h3 className="text-align-center">week</h3>
 
-          <Chart
-            minTickGap={30}
-            data={portfolioHistoryWeek?.map((item) => {
-              return {
-                percent: Number(
-                  ((((item.equity - 10000) / 10000) * 100) / 2 + 50).toFixed(2)
-                ),
-                timestamp: new Date(item.timestamp).toISOString().slice(5, 10),
-              };
-            })}
-          ></Chart>
-        </div>
+            <Chart
+              minTickGap={30}
+              data={portfolioHistoryWeek?.map((item) => {
+                return {
+                  percent: Number(
+                    ((((item.equity - 10000) / 10000) * 100) / 2 + 50).toFixed(
+                      2
+                    )
+                  ),
+                  timestamp: new Date(item.timestamp)
+                    .toISOString()
+                    .slice(5, 10),
+                };
+              })}
+            ></Chart>
+          </div>
+        )}
         <div className="chart-block">
           <h3 className="text-align-center">day</h3>
 
