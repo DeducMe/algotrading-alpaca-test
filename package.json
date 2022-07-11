@@ -32,7 +32,7 @@
     "postinstall": "npm run tsc",
     "local": "npm run tsc && node lib/index.js",
     "local-build": "cd alpaca-trading-front && npm run build && cd ..",
-    "build": "cd alpaca-trading-front && nmp i && npm run build && cd .."
+    "build": "cd alpaca-trading-front && npm i && npm run build && cd .."
   },
   "keywords": [],
   "author": "",
