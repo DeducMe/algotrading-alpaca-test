@@ -58,7 +58,7 @@ function App() {
   }, [disablePositionsClose]);
 
   useEffect(() => {
-    if (currentGain && SPYHistoryMonth) {
+    if (currentGain && SPYHistoryMonth && SPYHistoryYear) {
       const changeSpyPercent = (
         (SPYHistoryMonth[SPYHistoryMonth.length - 1].equity /
           SPYHistoryMonth[0].equity) *
@@ -111,7 +111,7 @@ function App() {
     const monthDateStringified = monthDate.toISOString().slice(0, 10);
 
     const yearDate = new Date();
-    yearDate.setFullYear(yearDate.getFullYear() + 1);
+    yearDate.setFullYear(yearDate.getFullYear() - 1);
     const yearDateStringified = yearDate.toISOString().slice(0, 10);
 
     fetch(`${url}api/tickers/SPY/${monthDateStringified}/${nowStringified}/1H`)
@@ -146,14 +146,14 @@ function App() {
           <div className="current-gain">
             <p>current gain - {currentGain.total}$</p>
             <p className={currentGain.percent >= 0 ? "green" : "red"}>
-              {(currentGain.percent >= 0 && "+") + currentGain.percent}%
+              {(currentGain.percent >= 0 ? "+" : "") + currentGain.percent}%
             </p>
           </div>
           {percentAboveSPY && (
             <div className="current-gain">
               <p>above SPY this month - </p>
               <p className={percentAboveSPY >= 0 ? "green" : "red"}>
-                {(percentAboveSPY >= 0 && "+") + percentAboveSPY}%
+                {(percentAboveSPY >= 0 ? "+" : "") + percentAboveSPY}%
               </p>
             </div>
           )}
@@ -161,7 +161,7 @@ function App() {
             <div className="current-gain">
               <p>above SPY this year - </p>
               <p className={percentAboveSPYYear >= 0 ? "green" : "red"}>
-                {(percentAboveSPYYear >= 0 && "+") + percentAboveSPYYear}%
+                {(percentAboveSPYYear >= 0 ? "+" : "") + percentAboveSPYYear}%
               </p>
             </div>
           )}
