@@ -111,7 +111,7 @@ function App() {
     const monthDateStringified = monthDate.toISOString().slice(0, 10);
 
     const yearDate = new Date();
-    yearDate.setDate(new Date().getDate() - 30);
+    yearDate.setFullYear(yearDate.getFullYear() + 1);
     const yearDateStringified = yearDate.toISOString().slice(0, 10);
 
     fetch(`${url}api/tickers/SPY/${monthDateStringified}/${nowStringified}/1H`)
